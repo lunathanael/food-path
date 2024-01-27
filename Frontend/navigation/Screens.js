@@ -13,6 +13,8 @@ import React from "react";
 import SettingsScreen from "../screens/Settings";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createStackNavigator } from "@react-navigation/stack";
+import LoginScreen from "../screens/LoginScreen";
+import { Provider } from "react-redux"
 
 const { width } = Dimensions.get("screen");
 
@@ -292,7 +294,7 @@ function AppStack(props) {
       />
       <Drawer.Screen
         name="Sign In"
-        component={ProScreen}
+        component={LoginScreen}
         options={{
           drawerIcon: ({ focused }) => (
             <Icon
