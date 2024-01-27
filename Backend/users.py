@@ -12,26 +12,31 @@ firebase_connection: FirebaseConnection = FirebaseConnection()
 dining_halls: list[DiningHall] = firebase_connection.get_dining_halls()
 
 class PossibleLunchTime:
-    def __init__(self, dining_hall: DiningHall, start_time: int, duration: int) -> None:
+    def __init__(self, dining_hall: DiningHall, start_time: int, duration: int, distance: float) -> None:
         self.dining_hall: DiningHall = dining_hall
         self.start_time: int = start_time
         self.end_time: int = start_time + duration
+        self.distance: float = distance
+        
+    def __weight(self):
+        return self.distance/MAX_WALKING_DISTANCE * (1-FOOD_WEIGHT) + self.dining_hall.menu.menu_weight() * FOOD_WEIGHT
         
     def __cmp__(self, other: PossibleLunchTime) -> int:
-        return self.start_time - other.start_time
+        return -1 if self.__weight() < other.__weight() else int(self.__weight() > other.__weight())
 
     @staticmethod
     def possible_location_and_time(start_class: Class | Location,
                                    dining_hall: DiningHall, 
-                                   end_class: Class) -> tuple[bool, int]:
+                                   end_class: Class) -> tuple[bool, int, float] | tuple[bool, None, None]:
         first_class = isinstance(start_class, Location)
+        if first_class:
+            start_class.location = start_class
         # Distance from start class to dining hall to end class going straight a -> b
-        distance: int = dining_hall.location.get_distance_miles(end_class.location) + \
-            start_class.location.get_distance(dining_hall.location) if first_class else 0
-        if distance < MAX_WALKING_DISTANCE:
+        total_distance: int = dining_hall.location.get_distance_miles(end_class.location) + \
+            start_class.location.get_distance_miles(dining_hall.location) if not first_class else 0
+        if total_distance < MAX_WALKING_DISTANCE:
             # Time to walk from class to dining hall and vice versa to end class going a ~> b
-            time_to_walk_start_class_to_dining_hall: int = start_class.location.get_time_to_walk_hours(dining_hall.location) \
-                                                if first_class else start_class.get_time_to_walk_hours(dining_hall.location)
+            time_to_walk_start_class_to_dining_hall: int = start_class.location.get_time_to_walk_hours(dining_hall.location)
             time_to_walk_dining_hall_to_end_class: int = dining_hall.location.get_time_to_walk_hours(end_class.location)
             # Time available to start eating
             available_start_time = start_class.end+BUFFER_TIME+time_to_walk_start_class_to_dining_hall if not first_class else \
@@ -45,8 +50,8 @@ class PossibleLunchTime:
             return eat_start_time - available_stop_time > TIME_TO_EAT and \
                 dining_hall.is_open_at_time(eat_start_time, TIME_TO_EAT) and \
                 dining_hall.location.get_path_distance_miles(end_class.location) + \
-                start_class.location.get_path_distance(dining_hall.location) if first_class else 0 < MAX_WALKING_DISTANCE, eat_start_time
-        return False, None
+                start_class.location.get_path_distance(dining_hall.location) if first_class else 0 < MAX_WALKING_DISTANCE, eat_start_time, total_distance
+        return False, None, None
 
 def plan_route(user: str) -> list:
     user: User = firebase_connection.get_user_data(user)
@@ -59,7 +64,8 @@ def plan_route(user: str) -> list:
             
     # Sort classes by start time
     week = [sorted(day, key=lambda class_data: class_data.start) for day in week]
-        
+    
+    lunch_options = []
     for day in week:
         if not day:
             continue
@@ -67,18 +73,20 @@ def plan_route(user: str) -> list:
         
         for dining_hall in dining_halls:
             # Can user walk to dining hall from dorm
-            is_possible, start_time = PossibleLunchTime.possible_location_and_time(user.location, dining_hall, day[0])
+            is_possible, start_time, distance = PossibleLunchTime.possible_location_and_time(user.location, dining_hall, day[0])
             if is_possible:
-                    possible_lunch_times.append(PossibleLunchTime(dining_hall, start_time, TIME_TO_EAT))
+                    possible_lunch_times.append(PossibleLunchTime(dining_hall, start_time, TIME_TO_EAT, distance))
             
             # Can user walk to dining hall from class and then to next class
             for class_data, next_class_data in zip(day[:-1], day[1:]):
-                is_possible, start_time = PossibleLunchTime.possible_location_and_time(class_data, dining_hall, next_class_data)
-                
+                is_possible, start_time, distance = PossibleLunchTime.possible_location_and_time(class_data, dining_hall, next_class_data)
+                if is_possible:
+                    possible_lunch_times.append(PossibleLunchTime(dining_hall, start_time, TIME_TO_EAT, distance))
             # Sort possible_lunch_times
-            def weight(food_weight, distance):
-                return distance/MAX_WALKING_DISTANCE * (1-FOOD_WEIGHT) + food_weight * FOOD_WEIGHT
+            possible_lunch_times = sorted(possible_lunch_times)
             
+        # Top 3 options
+        lunch_options.append(possible_lunch_times[:3])
             
 
 plan_route("Aidan")
