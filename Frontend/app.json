@@ -23,7 +23,15 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey" : ""
+      }
+    },
+    "android" : {
+      "config": {
+        "googleMapsApiKey" : ""
+      }
     }
   }
 }
