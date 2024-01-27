@@ -43,11 +43,11 @@ class PossibleFoodTime:
                                             start_class.location.get_distance_miles(end_class.location)
         if total_difference_in_distance < MAX_WALKING_DISTANCE:
             # Time to walk from class to dining hall and vice versa to end class going a ~> b
-            time_to_walk_start_class_to_dining_hall: int = start_class.location.get_time_to_walk_hours(dining_hall.location)
-            time_to_walk_dining_hall_to_end_class: int = dining_hall.location.get_time_to_walk_hours(end_class.location)
+            time_to_walk_start_class_to_dining_hall: int = start_class.location.get_time_to_walk_minutes(dining_hall.location)
+            time_to_walk_dining_hall_to_end_class: int = dining_hall.location.get_time_to_walk_minutes(end_class.location)
             # Time available to start eating
             available_start_time = start_class.end+BUFFER_TIME+time_to_walk_start_class_to_dining_hall if not first_class else \
-                end_class.start-time_to_walk_start_class_to_dining_hall-BUFFER_TIME-MAX_WAIT_FOR_CLASS_TO_START
+                end_class.start-time_to_walk_start_class_to_dining_hall-BUFFER_TIME-MAX_WAIT_FOR_CLASS_TO_START-TIME_TO_EAT
             # Time available to stop eating
             available_stop_time = end_class.start-BUFFER_TIME-time_to_walk_dining_hall_to_end_class if not last_class else \
                 start_class.end+time_to_walk_dining_hall_to_end_class+BUFFER_TIME+MAX_WAIT_FOR_CLASS_TO_START
@@ -55,7 +55,7 @@ class PossibleFoodTime:
             eat_start_time: int = dining_hall.find_best_time(available_start_time, available_stop_time, TIME_TO_EAT)
             # Is dining hall open at start time
             # Distance from start class to dining hall to end class going straight a ~> b
-            return eat_start_time and eat_start_time - available_stop_time > TIME_TO_EAT and \
+            return eat_start_time and available_stop_time - eat_start_time > TIME_TO_EAT and \
                 dining_hall.is_open_at_time(eat_start_time, TIME_TO_EAT), \
                 eat_start_time, total_difference_in_distance
         return False, None, None

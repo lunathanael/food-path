@@ -18,7 +18,7 @@ DINING_HALLS = {'South Pointe at Case': {'html': 'South%20Pointe%20at%20Case', '
                         'The Gallery at Snyder Phillips': {'html': 'The%20Gallery%20at%20Snyder%20Phillips', 'location': [42.73019974531501, -84.47278836932867], 'times': [900, 1500, 1630, 2100]}} 
 MEAL_TIMES = ['breakfast', 'lunch', 'dinner']
 RESET_USERS = False
-RESET_DINING_HALLS = True
+RESET_DINING_HALLS = False
 MINUTES_PER_MILE = 15
 
 class Location:
@@ -37,7 +37,7 @@ class Location:
         return math.hypot(self.__lat_long_to_miles(self.lat, True)-self.__lat_long_to_miles(other.lat, True),
                           self.__lat_long_to_miles(self.long, False)-self.__lat_long_to_miles(other.long, False))
         
-    def get_time_to_walk_hours(self, other: Location) -> int:
+    def get_time_to_walk_minutes(self, other: Location) -> int:
         return self.get_path_distance_miles(other) * MINUTES_PER_MILE # 15 minutes per mile
         
     def get_path_distance_miles(self, other: Location) -> float:
@@ -103,12 +103,12 @@ class DiningHall:
     
     def find_best_time(self, start_time: int, end_time: int, duration: int) -> int | None:
         for start, end in zip(self.__hours[:-1], self.__hours[1:]):
-            if end_time >= end and start_time <= start:
+            if end_time <= end and start_time >= start:
                 return end_time - duration
-            elif end_time >= end and start_time >= start:
+            elif end_time <= end and start_time <= start:
                 if end_time - duration < start:
                     return end_time - duration
-            elif end_time <= end and start_time <= start:
+            elif end_time >= end and start_time >= start:
                 if start_time + duration < end:
                     return end - duration
                     
