@@ -7,7 +7,7 @@ import os, math, urllib.request, firebase_admin
 DINING_HALLS_TO_HTML = {'South Pointe at Case': 'South%20Pointe%20at%20Case', 'Sparty\'s Market': 'Sparty%27s%20market', 'The Edge at Akers': 'The%20Edge%20at%20Akers', 'Brody Square': 'Brody%20Square', 'Holden Dining Hall': 'Holden%20Dining%20Hall', 'Holmes Dining Hall': 'Holmes%20Dining%20Hall', 'The State Room at Kellogg': 'The%20State%20Room%20at%20Kellogg', 'Heritage Commons at Landon': 'Heritage%20Commons%20at%20Landon', 'Thrive at Owen': 'Thrive%20at%20Owen', 'The Vista at Shaw': 'The%20Vista%20at%20Shaw', 'The Gallery at Snyder Phillips': 'The%20Gallery%20at%20Snyder%20Phillips'}
 MEAL_TIMES = ['breakfast', 'lunch', 'dinner']
 RESET_USERS = False
-RESET_DINING_HALLS = True
+RESET_DINING_HALLS = False
 STAY_IN_DINING_HALL_AFTER_CLOSE = False
 MINUTES_PER_MILE = 15
 
@@ -58,15 +58,16 @@ class Food:
     def to_dict(self) -> dict:
         return {"weight": self.weight, "calories": self.calories, "description": self.description}
 class Menu:
-    def __init__(self, breakfast: dict, lunch: dict, dinner: dict):
+    def __init__(self, breakfast: dict = {}, lunch: dict = {}, dinner: dict = {}):
         self.breakfast: list[Food] = [Food(name, **food) for name, food in breakfast.items()]
         self.lunch: list[Food] = [Food(name, **food) for name, food in lunch.items()]
         self.dinner: list[Food] = [Food(name, **food) for name, food in dinner.items()]
         
-    def __init__(self):
-        self.breakfast: list[Food] = []
-        self.lunch: list[Food] = []
-        self.dinner: list[Food] = []
+    def menu_weight(self) -> float:
+        return (sum(sorted(self.breakfast, key=lambda food: food.weight)[:5]) / 5 +
+                sum(sorted(self.lunch, key=lambda food: food.weight)[:5]) / 5 +
+                sum(sorted(self.dinner, key=lambda food: food.weight)[:5]) / 5
+                ) / 3
 
     def to_dict(self) -> dict:
         return {"breakfast": {food.name: food.to_dict() for food in self.breakfast}, 
@@ -124,22 +125,11 @@ class FirebaseConnection:
     def __add_dining_hall(self, name: str, location: [int, int], hours: list, menu: dict | Menu) -> None:
         if isinstance(menu, Menu):
             menu = menu.to_dict()
+        if not menu:
+            return
         self.ref.child(f"dining_halls/{name}").set({"location": {"lat": location[0], "long": location[1]},
                                             "hours": hours,
                                             "menu": menu})
-    def __create_menu(self, breakfast: list, lunch: list, dinner: list) -> dict:
-        return {"breakfast": {food["name"]: {"weight": food["weight"], 
-                                            "calories": food["calories"], 
-                                            "description": food["description"]} for food in breakfast}, 
-                "lunch": {food["name"]: {"weight": food["weight"], 
-                                            "calories": food["calories"], 
-                                            "description": food["description"]} for food in lunch}, 
-                "dinner": {food["name"]: {"weight": food["weight"], 
-                                            "calories": food["calories"], 
-                                            "description": food["description"]} for food in dinner}}
-        
-    def __create_food(self, name: str, weight: float, calories: int, description: str) -> dict:
-        return {"name": name, "weight": weight, "calories": calories, "description": description}
 
     def __get_food_info(self, dining_hall: str, current_date: date, dining_time: str) -> list[Food]:
         foods: list[Food] = []
@@ -149,7 +139,7 @@ class FirebaseConnection:
 
         for tag in soup.find_all('li', attrs={'class': 'menu-item'}):
             try: 
-                meal_name: str = tag.find('div', attrs={'class': 'meal-title '+dining_time}).text
+                meal_name: str = tag.find('div', attrs={'class': f'meal-title {dining_time}'}).text
                 description: str = tag.find('div', attrs={'class': 'allergens'}).text.replace('\n', '')
                 foods.append(Food(meal_name, 0.5, 0, description))
             except:
@@ -164,17 +154,6 @@ class FirebaseConnection:
         return dining_hall_menu
 
     def __init_dining_halls(self) -> None:
-        # breakfast = [self.__create_food("Eggs", 0.2, 150, "Eggs"), self.__create_food("Bacon", 0.6, 200, "Bacon")]
-        # lunch = [self.__create_food("Pizza", 0.5, 400, "Cheese"), self.__create_food("Cheese Burger", 0.4, 450, "Bread, Meat, Cheese")]
-        # dinner = [self.__create_food("Chicken Sandwich", 0.6, 480, "Chicken, Bread"), self.__create_food("Tacos", 0.7, 600, "Steak, Tortilla, Cheese, Lettuce")]
-        # case_menu = self.__create_menu(breakfast, lunch, dinner)
-        # self.__add_dining_hall("Case", [42.7244946181507, -84.48848047008471], [700, 1500, 1630, 2100], case_menu)
-    
-        # breakfast = [self.__reate_food("Eggs", 0.2, 150, "Eggs"), self.__create_food("Bacon", 0.6, 200, "Bacon")]
-        # lunch = [self.__create_food("Pizza", 0.5, 400, "Cheese"), self.__create_food("Cheese Burger", 0.4, 450, "Bread, Meat, Cheese")]
-        # dinner = [self.__create_food("Chicken Sandwich", 0.6, 480, "Chicken, Bread"), self.__create_food("Tacos", 0.7, 600, "Steak, Tortilla, Cheese, Lettuce")]
-        # akers_menu = self.__create_menu(breakfast, lunch, dinner)
-        # self.__add_dining_hall("Akers", [42.724511319457186, -84.4648138643711], [700, 1500, 1630, 2100], akers_menu)
         for dining_hall in DINING_HALLS_TO_HTML.keys():
             # TODO get location and hours
             self.__add_dining_hall(dining_hall, 
