@@ -5,6 +5,7 @@ import os, math
 
 RESET_USERS = False
 RESET_DINING_HALLS = False
+STAY_IN_DINING_HALL_AFTER_CLOSE = False
 
 class Location:
     def __init__(self, lat: float, long: float):
@@ -22,7 +23,12 @@ class Location:
         return math.hypot(self.__lat_long_to_miles(self.lat, True)-self.__lat_long_to_miles(other.lat, True),
                           self.__lat_long_to_miles(self.long, False)-self.__lat_long_to_miles(other.long, False))
         
+    def get_time_to_walk(self, other: Location) -> int:
+        # TODO use google maps api to get time to walk
+        return self.get_path_distance(other) * 15 # 15 minutes per mile
+        
     def get_path_distance(self, other: Location) -> float:
+        # TODO use google maps api to get distance
         return self.get_distance(other)
 
 class Class:
@@ -53,8 +59,25 @@ class DiningHall:
     def __init__(self, name: str, location: dict[str, int], hours: list, menu: dict):
         self.name: str = name
         self.location: Location = Location(location)
-        self.hours: list[int] = hours
+        self.__hours: list[int] = hours
         self.menu: Menu = Menu(**menu)
+        
+    def is_open_at_time(self, start_time: int | None, duration: int) -> bool:
+        return start_time and any(start_time > start and start_time+duration < end \
+                                for start, end in zip(self.__hours[::2], self.__hours[1::2]))
+    
+    def find_best_time(self, start_time: int, end_time: int, duration: int) -> int:
+        for start, end in zip(self.__hours[:-1], self.__hours[1:]):
+            if end_time > end and start_time < start:
+                if end_time + duration > end and not STAY_IN_DINING_HALL_AFTER_CLOSE:
+                    return end - duration
+                else:
+                    return start_time
+            elif end_time > end and start_time > start:
+                ...
+                    
+        return None
+        
 class FirebaseConnection:
     def __init__(self):
         self.app = self.__setup_connection()
@@ -64,7 +87,8 @@ class FirebaseConnection:
     
     def __setup_connection(self) -> firebase_admin.App:
         # Return an app connected to the parking database
-        auth_certification = firebase_admin.credentials.Certificate(os.path.dirname(__file__)+"/food-path-24322-firebase-adminsdk-b8zhl-2b9c4db741.json")
+        auth_certification = firebase_admin.credentials.Certificate(os.path.dirname(__file__)+ \
+                                        "/food-path-24322-firebase-adminsdk-b8zhl-2b9c4db741.json")
         real_time_db_app = firebase_admin.initialize_app(auth_certification, {
             'databaseURL': 'https://food-path-24322-default-rtdb.firebaseio.com/'})
         return real_time_db_app
