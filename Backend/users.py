@@ -11,17 +11,20 @@ FOOD_WEIGHT = 0.5
 firebase_connection: FirebaseConnection = FirebaseConnection()
 dining_halls: list[DiningHall] = firebase_connection.get_dining_halls()
 
-class PossibleLunchTime:
+class PossibleFoodTime:
     def __init__(self, dining_hall: DiningHall, start_time: int, duration: int, distance: float) -> None:
         self.dining_hall: DiningHall = dining_hall
         self.start_time: int = start_time
         self.end_time: int = start_time + duration
         self.distance: float = distance
         
+    def to_dict(self) -> dict:
+        return {"dining_hall": self.dining_hall.name, "start_time": self.start_time}
+        
     def __weight(self):
         return self.distance/MAX_WALKING_DISTANCE * (1-FOOD_WEIGHT) + self.dining_hall.menu.menu_weight() * FOOD_WEIGHT
         
-    def __cmp__(self, other: PossibleLunchTime) -> int:
+    def __cmp__(self, other: PossibleFoodTime) -> int:
         return -1 if self.__weight() < other.__weight() else int(self.__weight() > other.__weight())
 
     @staticmethod
@@ -53,8 +56,26 @@ class PossibleLunchTime:
                 start_class.location.get_path_distance(dining_hall.location) if first_class else 0 < MAX_WALKING_DISTANCE, eat_start_time, total_distance
         return False, None, None
 
+def find_possible_food_times(user: User, classes: list[Class]) -> list[PossibleFoodTime]:
+    possible_food_times: list[PossibleFoodTime] = []
+    
+    for dining_hall in dining_halls:
+        # Can user walk to dining hall from dorm
+        is_possible, start_time, distance = PossibleFoodTime.possible_location_and_time(user.location, dining_hall, classes[0])
+        if is_possible:
+                possible_food_times.append(PossibleFoodTime(dining_hall, start_time, TIME_TO_EAT, distance))
+        
+        # Can user walk to dining hall from class and then to next class
+        for class_data, next_class_data in zip(classes[:-1], classes[1:]):
+            is_possible, start_time, distance = PossibleFoodTime.possible_location_and_time(class_data, dining_hall, next_class_data)
+            if is_possible:
+                possible_food_times.append(PossibleFoodTime(dining_hall, start_time, TIME_TO_EAT, distance))
+        # Sort possible_lunch_times
+        possible_food_times = sorted(possible_food_times)
+    return possible_food_times
+        
 def plan_route(user: str) -> list:
-    user: User = firebase_connection.get_user_data(user)
+    user, update_data = firebase_connection.get_user_data(user)
     
     # Initialize list of classes
     week: list[list[Class]] = [[],[],[],[],[],[],[]]
@@ -65,28 +86,16 @@ def plan_route(user: str) -> list:
     # Sort classes by start time
     week = [sorted(day, key=lambda class_data: class_data.start) for day in week]
     
-    lunch_options = []
+    food_options: list[list[PossibleFoodTime]] = []
     for day in week:
         if not day:
+            food_options.append([])
             continue
-        possible_lunch_times: list[PossibleLunchTime] = []
         
-        for dining_hall in dining_halls:
-            # Can user walk to dining hall from dorm
-            is_possible, start_time, distance = PossibleLunchTime.possible_location_and_time(user.location, dining_hall, day[0])
-            if is_possible:
-                    possible_lunch_times.append(PossibleLunchTime(dining_hall, start_time, TIME_TO_EAT, distance))
-            
-            # Can user walk to dining hall from class and then to next class
-            for class_data, next_class_data in zip(day[:-1], day[1:]):
-                is_possible, start_time, distance = PossibleLunchTime.possible_location_and_time(class_data, dining_hall, next_class_data)
-                if is_possible:
-                    possible_lunch_times.append(PossibleLunchTime(dining_hall, start_time, TIME_TO_EAT, distance))
-            # Sort possible_lunch_times
-            possible_lunch_times = sorted(possible_lunch_times)
-            
+        possible_food_times: list[PossibleFoodTime] = find_possible_food_times(user, day)    
         # Top 3 options
-        lunch_options.append(possible_lunch_times[:3])
-            
+        food_options.append([possible_food_time.to_dict() for possible_food_time in possible_food_times[:3]])
+    update_data(food_options)
+    
 
 plan_route("Aidan")
