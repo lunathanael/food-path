@@ -25,18 +25,18 @@ const mapCustomStyle = [
   { "featureType": "poi.park", "elementType": "labels.text.fill", "stylers": [ { "color": "#6b9a76", "visibility": "off" } ] }, 
   { "featureType": "poi.school", "elementType": "labels.text.fill", "stylers": [ { "color": "#6b9a76", "visibility": "off" } ] }, 
   { "featureType": "poi.school", "elementType": "geometry", "stylers": [ { "color": "#263c3f", "visibility": "off" } ] }, 
-  { "featureType": "road", "elementType": "geometry", "stylers": [ { "color": "#38414e" } ] }, {
-     "featureType": "road", "elementType": "geometry.stroke", "stylers": [ { "color": "#212a37" } ] }, 
-     { "featureType": "road", "elementType": "labels.text.fill", "stylers": [ { "color": "#9ca5b3" } ] }, 
-     { "featureType": "road.highway", "elementType": "geometry", "stylers": [ { "color": "#746855" } ] }, 
-     { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [ { "color": "#1f2835" } ] }, 
-     { "featureType": "road.highway", "elementType": "labels.text.fill", "stylers": [ { "color": "#f3d19c" } ] }, 
-     { "featureType": "transit", "elementType": "geometry", "stylers": [ { "color": "#2f3948", "visibility": "off"  } ] }, 
-     { "featureType": "transit.station", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563", "visibility": "off"  } ] }, 
-     { "featureType": "water", "elementType": "geometry", "stylers": [ { "color": "#17263c" } ] }, 
-     { "featureType": "water", "elementType": "labels.text.fill", "stylers": [ { "color": "#515c6d" } ] }, 
-     { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [ { "color": "#17263c" } ] } 
-    ];
+  { "featureType": "road", "elementType": "geometry", "stylers": [ { "color": "#38414e" } ] }, 
+  { "featureType": "road", "elementType": "geometry.stroke", "stylers": [ { "color": "#212a37" } ] }, 
+  { "featureType": "road", "elementType": "labels.text.fill", "stylers": [ { "color": "#9ca5b3" } ] }, 
+  { "featureType": "road.highway", "elementType": "geometry", "stylers": [ { "color": "#746855" } ] }, 
+  { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [ { "color": "#1f2835" } ] }, 
+  { "featureType": "road.highway", "elementType": "labels.text.fill", "stylers": [ { "color": "#f3d19c" } ] }, 
+  { "featureType": "transit", "elementType": "geometry", "stylers": [ { "color": "#2f3948", "visibility": "off"  } ] }, 
+  { "featureType": "transit.station", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563", "visibility": "off"  } ] }, 
+  { "featureType": "water", "elementType": "geometry", "stylers": [ { "color": "#17263c" } ] }, 
+  { "featureType": "water", "elementType": "labels.text.fill", "stylers": [ { "color": "#515c6d" } ] }, 
+  { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [ { "color": "#17263c" } ] } 
+];
   
 
 export default class Onboarding extends React.Component {
@@ -97,14 +97,11 @@ export default class Onboarding extends React.Component {
           </MapView>
         </Block>
         <Block flex space="between" style={styles.padded}>
-          <Block flex space="around" style={{ zIndex: 2 }}>
+          <Block flex space="around" style={{ zIndex: 1 }}>
             <Block>
               <Block>
-                <Text color="black" size={60}>Food Path</Text>
+                <Text color="white" size={60}>Food Path</Text>
               </Block>
-              <Text size={16} color='blue'>
-                Automatically optimize your daily routes.
-              </Text>
             </Block>
             <Block center>
               <Button
@@ -127,8 +124,10 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
   },
   padded: {
-    paddingHorizontal: theme.SIZES.BASE * 2,
-    position: 'relative',
+    paddingHorizontal: theme.SIZES.BASE*2,
+    marginTop: 100,
+    padding: 0,
+    // position: 'relative',
     bottom: theme.SIZES.BASE,
   },
   button: {
