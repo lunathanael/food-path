@@ -55,7 +55,7 @@ class PossibleFoodTime:
             eat_start_time: int = dining_hall.find_best_time(available_start_time, available_stop_time, TIME_TO_EAT)
             # Is dining hall open at start time
             # Distance from start class to dining hall to end class going straight a ~> b
-            return eat_start_time and available_stop_time - eat_start_time > TIME_TO_EAT and \
+            return eat_start_time and available_stop_time - eat_start_time >= TIME_TO_EAT and \
                 dining_hall.is_open_at_time(eat_start_time, TIME_TO_EAT), \
                 eat_start_time, total_difference_in_distance
         return False, None, None
