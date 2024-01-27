@@ -16,7 +16,7 @@ export default class Onboarding extends React.Component {
         <StatusBar barStyle="light-content" />
         <Block flex center>
           <ImageBackground
-            source={{  uri: Images.Onboarding }}
+            source={require('../assets/images/test.png')}
             style={{ height: height, width: width, marginTop: '-55%', zIndex: 1 }}
           />
         </Block>
@@ -24,13 +24,10 @@ export default class Onboarding extends React.Component {
           <Block flex space="around" style={{ zIndex: 2 }}>
             <Block>
               <Block>
-                <Text color="white" size={60}>Material</Text>
+                <Text color="black" size={60}>Food Path</Text>
               </Block>
-              <Block row>
-                <Text color="white" size={60}>Kit</Text>
-              </Block>
-              <Text size={16} color='rgba(255,255,255,0.6)'>
-                Fully coded React Native components.
+              <Text size={16} color='blue'>
+                Automatically optimize your daily routes.
               </Text>
             </Block>
             <Block center>
