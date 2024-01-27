@@ -65,6 +65,14 @@ class Food:
         
     def to_dict(self) -> dict:
         return {"weight": self.weight, "calories": self.calories, "description": self.description}
+
+    def increase_weight(self):
+        self.weight += 0.1
+        self.weight = min(1, self.weight)
+    def decrease_weight(self):
+        self.weight -= 0.1
+        self.weight = max(0, self.weight)
+
 class Menu:
     def __init__(self, breakfast: dict = {}, lunch: dict = {}, dinner: dict = {}):
         self.breakfast: list[Food] = [Food(name, **food) for name, food in breakfast.items()]
@@ -192,5 +200,20 @@ class FirebaseConnection:
     def get_dining_halls(self) -> list[DiningHall]:
         return [DiningHall(name, **dining_hall) for name, dining_hall in self.ref.child("dining_halls").get().items()]
     
+    def find_distance(person_location:[int, int], dining_hall_location:[int, int]):
+        distance = (person_location[0]-dining_hall_location[0])^2+(person_location[1]-dining_hall_location[1])^2
+        distance = sqrt(distance)
+    def check_distance(person_location:[int, int]):
+        for hall, db in DINING_HALLS:
+            if find_distance(person_location, db['location'])<0.5:
+                raise_question(hall)
+    def raise_question(hall: Menu):
+        for food in hall.breakfast:
+            rating = input("Do you like the {food.name}? from {hall.name}")
+            if rating == True:
+                food.increase_weight
+            else:
+                food.decrease_weight
+
 if __name__ == "__main__":
     firebase_connection = FirebaseConnection()
