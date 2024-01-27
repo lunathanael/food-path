@@ -18,8 +18,7 @@ DINING_HALLS = {'South Pointe at Case': {'html': 'South%20Pointe%20at%20Case', '
                         'The Gallery at Snyder Phillips': {'html': 'The%20Gallery%20at%20Snyder%20Phillips', 'location': [42.73019974531501, -84.47278836932867], 'times': [900, 1500, 1630, 2100]}} 
 MEAL_TIMES = ['breakfast', 'lunch', 'dinner']
 RESET_USERS = False
-RESET_DINING_HALLS = False
-STAY_IN_DINING_HALL_AFTER_CLOSE = False
+RESET_DINING_HALLS = True
 MINUTES_PER_MILE = 15
 
 class Location:
@@ -104,12 +103,12 @@ class DiningHall:
     
     def find_best_time(self, start_time: int, end_time: int, duration: int) -> int | None:
         for start, end in zip(self.__hours[:-1], self.__hours[1:]):
-            if end_time > end and start_time < start:
+            if end_time >= end and start_time <= start:
                 return end_time - duration
-            elif end_time > end and start_time > start:
+            elif end_time >= end and start_time >= start:
                 if end_time - duration < start:
                     return end_time - duration
-            elif end_time < end and start_time < start:
+            elif end_time <= end and start_time <= start:
                 if start_time + duration < end:
                     return end - duration
                     
@@ -134,7 +133,9 @@ class FirebaseConnection:
     def __add_dining_hall(self, name: str, location: [int, int], hours: list, menu: dict | Menu) -> None:
         if isinstance(menu, Menu):
             menu = menu.to_dict()
-        if not menu:
+        if 'Holden' in name:
+            name = 'Holden Dining Hall'
+        if not menu['breakfast'] and not menu['lunch'] and not menu['dinner']:
             return
         self.ref.child(f"dining_halls/{name}").set({"location": {"lat": location[0], "long": location[1]},
                                             "hours": hours,
@@ -180,7 +181,9 @@ class FirebaseConnection:
 
     def __init_users(self) -> None:
         classes = {"CSE 232": self.__create_class([42.72667482223444, -84.4831625150824], [1020, 1240], [5]),
-                    "CSE 260": self.__create_class([42.73057305428702, -84.48175181501252], [1500, 1620], [1, 3, 5])}
+                    "CSE 260": self.__create_class([42.7284703908709, -84.47829548101657], [1500, 1620], [1, 3, 5]),
+                    "IAH 207": self.__create_class([42.72459681870728, -84.46473911567855], [1240, 1430], [2, 4]),
+                    "ISB 202": self.__create_class([42.73057305428702, -84.48175181501252], [1240, 1600], [1, 3]),}
         self.__add_user("Aidan", "12345", classes, [42.72258662612383, -84.48989148173476])
 
     def get_user_data(self, username: str) -> tuple[User, Callable[[dict], None]]:
