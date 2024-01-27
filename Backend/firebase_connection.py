@@ -201,7 +201,7 @@ class FirebaseConnection:
         classes = {"CSE 232": self.__create_class([42.72667482223444, -84.4831625150824], [1020, 1240], [5]),
                     "CSE 260": self.__create_class([42.7284703908709, -84.47829548101657], [1500, 1620], [1, 3, 5]),
                     "IAH 207": self.__create_class([42.72459681870728, -84.46473911567855], [1240, 1430], [2, 4]),
-                    "ISB 202": self.__create_class([42.73057305428702, -84.48175181501252], [1240, 1600], [1, 3]),}
+                    "ISB 202": self.__create_class([42.73057305428702, -84.48175181501252], [1240, 1400], [1, 3]),}
         self.__add_user("Aidan", "12345", classes, [42.72258662612383, -84.48989148173476])
 
     def get_user_data(self, username: str) -> tuple[User, Callable[[dict], None]]:
