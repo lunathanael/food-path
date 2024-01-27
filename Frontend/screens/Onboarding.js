@@ -9,6 +9,13 @@ import Images from '../constants/Images';
 
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 
+let id = 0;
+
+const DINING_HALLS_LOCATIONS = {
+  'South Pointe at Case': [42.72453932922057, -84.48844707117367], "Sparty's Market": [42.72867352001793, -84.49440369630766], "The Edge at Akers": [42.72426284934323, -84.46473942700027], "Brody Square": [42.731472990618464, -84.49519192699452], "Holden Dining Hall": [42.721120608388475, -84.48858822885974], "Holmes Dining Hall": [42.72679464281192, -84.4645800270007], "The State Room at Kellogg": [42.73191102029839, -84.49316017118278], "Heritage Commons at Landon": [42.733953903515385, -84.48511974233824], "Thrive at Owen": [42.726750094109065, -84.47062737303804], "The Vista at Shaw": [42.72702766286321, -84.47526964233279], "The Gallery at Snyder Phillips": [42.73019974531501, -84.47278836932867]};
+
+  
+
 export default class Onboarding extends React.Component {
 
   constructor(props) {
@@ -16,14 +23,18 @@ export default class Onboarding extends React.Component {
 
     this.state = {
       region: {
-        latitude: 37.78825,
-        longitude: -122.4324,
-        latitudeDelta: 0.922,
-        longitudeDelta: 0.421,
+        latitude: 42.7229439975,
+        longitude: -84.4792321495,
+        latitudeDelta: 0.0422,
+        longitudeDelta: 0.0221,
       },
       markers: [],
     };
 
+    for (const hall in DINING_HALLS_LOCATIONS) {
+      this.state.markers.push({'key' : hall, 'coordinate': {'latitude': DINING_HALLS_LOCATIONS[hall][0], 'longitude': DINING_HALLS_LOCATIONS[hall][1]}});
+    }
+    console.log(this.state.markers);
     this.onMapPress = this.onMapPress.bind(this);
   }
     
@@ -55,7 +66,6 @@ export default class Onboarding extends React.Component {
             {this.state.markers.map((marker) => (
               <Marker
                 title={marker.key}
-                image={flagPinkImg}
                 key={marker.key}
                 coordinate={marker.coordinate}
               />
