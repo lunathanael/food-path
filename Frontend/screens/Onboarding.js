@@ -62,13 +62,6 @@ export default class Onboarding extends React.Component {
     
   onMapPress(e) {
     this.setState({
-      markers: [
-        ...this.state.markers,
-        {
-          coordinate: e.nativeEvent.coordinate,
-          key: `foo${id++}`,
-        },
-      ],
     });
   }
   
@@ -80,6 +73,7 @@ export default class Onboarding extends React.Component {
         <StatusBar barStyle="light-content" />
         <Block flex center>
           <MapView
+            provider={PROVIDER_GOOGLE}
             style={styles.map}
             initialRegion={this.state.region}
             customMapStyle={mapCustomStyle}
