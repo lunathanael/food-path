@@ -2,9 +2,20 @@ from __future__ import annotations
 from bs4 import BeautifulSoup
 from firebase_admin import db
 from datetime import date
+from typing import Callable
 import os, math, urllib.request, firebase_admin
 
-DINING_HALLS_TO_HTML = {'South Pointe at Case': 'South%20Pointe%20at%20Case', 'Sparty\'s Market': 'Sparty%27s%20market', 'The Edge at Akers': 'The%20Edge%20at%20Akers', 'Brody Square': 'Brody%20Square', 'Holden Dining Hall': 'Holden%20Dining%20Hall', 'Holmes Dining Hall': 'Holmes%20Dining%20Hall', 'The State Room at Kellogg': 'The%20State%20Room%20at%20Kellogg', 'Heritage Commons at Landon': 'Heritage%20Commons%20at%20Landon', 'Thrive at Owen': 'Thrive%20at%20Owen', 'The Vista at Shaw': 'The%20Vista%20at%20Shaw', 'The Gallery at Snyder Phillips': 'The%20Gallery%20at%20Snyder%20Phillips'}
+DINING_HALLS = {'South Pointe at Case': {'html': 'South%20Pointe%20at%20Case', 'location': [42.72453932922057, -84.48844707117367], 'times': [700, 1500, 1630, 2100]}, 
+                        'Sparty\'s Market': {'html': 'Sparty%27s%20market', 'location': [42.72867352001793, -84.49440369630766], 'times': [730, 1900]},
+                        'The Edge at Akers': {'html': 'The%20Edge%20at%20Akers', 'location': [42.72426284934323, -84.46473942700027], 'times': [900, 1500, 1630, 2100]},
+                        'Brody Square': {'html': 'Brody%20Square', 'location': [42.731472990618464, -84.49519192699452], 'times': [900, 1500, 1630, 2100]},
+                        'Holden Dining Hall': {'html': 'Holden%20Dining%20Hall', 'location': [42.721120608388475, -84.48858822885974], 'times': [700, 2000]},
+                        'Holmes Dining Hall': {'html': 'Holmes%20Dining%20Hall', 'location': [42.72679464281192, -84.4645800270007], 'times': [700, 2000]},
+                        'The State Room at Kellogg': {'html': 'The%20State%20Room%20at%20Kellogg', 'location': [42.73191102029839, -84.49316017118278], 'times': [1100, 1400, 1600, 2200]},
+                        'Heritage Commons at Landon': {'html': 'Heritage%20Commons%20at%20Landon', 'location': [42.733953903515385, -84.48511974233824], 'times': [900, 1500, 1630, 2300]},
+                        'Thrive at Owen': {'html': 'Thrive%20at%20Owen', 'location': [42.726750094109065, -84.47062737303804], 'times': [1100, 1500, 1630, 1900]},
+                        'The Vista at Shaw': {'html': 'The%20Vista%20at%20Shaw', 'location': [42.72702766286321, -84.47526964233279], 'times': [700, 1500, 1630, 1900]},
+                        'The Gallery at Snyder Phillips': {'html': 'The%20Gallery%20at%20Snyder%20Phillips', 'location': [42.73019974531501, -84.47278836932867], 'times': [900, 1500, 1630, 2100]}} 
 MEAL_TIMES = ['breakfast', 'lunch', 'dinner']
 RESET_USERS = False
 RESET_DINING_HALLS = False
@@ -28,11 +39,9 @@ class Location:
                           self.__lat_long_to_miles(self.long, False)-self.__lat_long_to_miles(other.long, False))
         
     def get_time_to_walk_hours(self, other: Location) -> int:
-        # TODO use google maps api to get time to walk
         return self.get_path_distance_miles(other) * MINUTES_PER_MILE # 15 minutes per mile
         
     def get_path_distance_miles(self, other: Location) -> float:
-        # TODO use google maps api to get distance
         return self.get_distance_miles(other)
 
 class Class:
@@ -149,16 +158,15 @@ class FirebaseConnection:
     def __get_dining_hall_meals(self, dining_hall) -> Menu:
         dining_hall_menu: Menu = Menu()
         for meal_time in MEAL_TIMES:
-            foods: list[Food] = self.__get_food_info(DINING_HALLS_TO_HTML[dining_hall], date.today(), meal_time)
+            foods: list[Food] = self.__get_food_info(DINING_HALLS[dining_hall]['html'], date.today(), meal_time)
             dining_hall_menu.add_food(meal_time, foods)
         return dining_hall_menu
 
     def __init_dining_halls(self) -> None:
-        for dining_hall in DINING_HALLS_TO_HTML.keys():
-            # TODO get location and hours
+        for dining_hall in DINING_HALLS.keys():
             self.__add_dining_hall(dining_hall, 
-                                   [42.724511319457186, -84.4648138643711], 
-                                   [700, 1500, 1630, 2100], 
+                                   DINING_HALLS[dining_hall]['location'], 
+                                   DINING_HALLS[dining_hall]['times'], 
                                    self.__get_dining_hall_meals(dining_hall))
 
     def __create_class(self, location: [int, int], time: [int, int], days: list) -> dict:
@@ -175,8 +183,8 @@ class FirebaseConnection:
                     "CSE 260": self.__create_class([42.73057305428702, -84.48175181501252], [1500, 1620], [1, 3, 5])}
         self.__add_user("Aidan", "12345", classes, [42.72258662612383, -84.48989148173476])
 
-    def get_user_data(self, username: str) -> User:
-        return User(username, **self.ref.child(f"users/{username}").get())
+    def get_user_data(self, username: str) -> tuple[User, Callable[[dict], None]]:
+        return User(username, **self.ref.child(f"users/{username}").get()), lambda data: self.ref.child(f"users/{username}/food_plan").set(data)
 
     def get_dining_halls(self) -> list[DiningHall]:
         return [DiningHall(name, **dining_hall) for name, dining_hall in self.ref.child("dining_halls").get().items()]
