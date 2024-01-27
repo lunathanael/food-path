@@ -30,18 +30,19 @@ class PossibleLunchTime:
             time_to_walk_start_class_to_dining_hall: int = start_class.location.get_time_to_walk(dining_hall.location) \
                                                 if first_class else start_class.get_time_to_walk(dining_hall.location)
             time_to_walk_dining_hall_to_end_class: int = dining_hall.location.get_time_to_walk(end_class.location)
+            # Time available to start eating
+            available_start_time = start_class.end+BUFFER_TIME+time_to_walk_start_class_to_dining_hall if first_class else \
+                end_class.start-time_to_walk_start_class_to_dining_hall-BUFFER_TIME-MAX_WAIT_FOR_CLASS_TO_START
+            # Time available to stop eating
+            available_stop_time = end_class.start-BUFFER_TIME-time_to_walk_dining_hall_to_end_class
             # Time to start eating
-            start_time: int = dining_hall.find_best_time(start_class.end+BUFFER_TIME+time_to_walk_start_class_to_dining_hall, 
-                                                         end_class.start-BUFFER_TIME-time_to_walk_dining_hall_to_end_class,
-                                                         TIME_TO_EAT) \
-                if first_class else dining_hall.find_best_time(end_class.start-time_to_walk_start_class_to_dining_hall-BUFFER_TIME-MAX_WAIT_FOR_CLASS_TO_START, 
-                                                               end_class.start-BUFFER_TIME-time_to_walk_dining_hall_to_end_class,
-                                                               TIME_TO_EAT) 
+            eat_start_time: int = dining_hall.find_best_time(available_start_time, available_stop_time, TIME_TO_EAT)
             # Is dining hall open at start time
             # Distance from start class to dining hall to end class going straight a ~> b
-            return dining_hall.is_open_at_time(start_time, TIME_TO_EAT) and \
+            return eat_start_time - available_stop_time > TIME_TO_EAT and \
+                dining_hall.is_open_at_time(eat_start_time, TIME_TO_EAT) and \
                 dining_hall.location.get_path_distance(end_class.location) + \
-                start_class.location.get_path_distance(dining_hall.location) if first_class else 0 < MAX_WALKING_DISTANCE, start_time
+                start_class.location.get_path_distance(dining_hall.location) if first_class else 0 < MAX_WALKING_DISTANCE, eat_start_time
         return False, None
 
 def plan_route(user: str) -> list:

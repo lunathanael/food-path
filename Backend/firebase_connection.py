@@ -68,13 +68,12 @@ class DiningHall:
     
     def find_best_time(self, start_time: int, end_time: int, duration: int) -> int:
         for start, end in zip(self.__hours[:-1], self.__hours[1:]):
+            # TODO
             if end_time > end and start_time < start:
-                if end_time + duration > end and not STAY_IN_DINING_HALL_AFTER_CLOSE:
-                    return end - duration
-                else:
-                    return start_time
+                return end_time - duration
             elif end_time > end and start_time > start:
-                ...
+                if end_time - duration < start:
+                    return end_time - duration
                     
         return None
         
