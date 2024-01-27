@@ -34,10 +34,14 @@ class PossibleFoodTime:
         first_class = isinstance(start_class, Location)
         if first_class:
             start_class.location = start_class
+        last_class = isinstance(end_class, Location)
+        if last_class:
+            end_class.location = end_class
         # Distance from start class to dining hall to end class going straight a -> b
-        total_distance: int = dining_hall.location.get_distance_miles(end_class.location) + \
-            start_class.location.get_distance_miles(dining_hall.location) if not first_class else 0
-        if total_distance < MAX_WALKING_DISTANCE:
+        total_difference_in_distance: int = dining_hall.location.get_distance_miles(end_class.location) + \
+                                            start_class.location.get_distance_miles(dining_hall.location) - \
+                                            start_class.location.get_distance_miles(end_class.location)
+        if total_difference_in_distance < MAX_WALKING_DISTANCE:
             # Time to walk from class to dining hall and vice versa to end class going a ~> b
             time_to_walk_start_class_to_dining_hall: int = start_class.location.get_time_to_walk_hours(dining_hall.location)
             time_to_walk_dining_hall_to_end_class: int = dining_hall.location.get_time_to_walk_hours(end_class.location)
@@ -45,15 +49,15 @@ class PossibleFoodTime:
             available_start_time = start_class.end+BUFFER_TIME+time_to_walk_start_class_to_dining_hall if not first_class else \
                 end_class.start-time_to_walk_start_class_to_dining_hall-BUFFER_TIME-MAX_WAIT_FOR_CLASS_TO_START
             # Time available to stop eating
-            available_stop_time = end_class.start-BUFFER_TIME-time_to_walk_dining_hall_to_end_class
+            available_stop_time = end_class.start-BUFFER_TIME-time_to_walk_dining_hall_to_end_class if not last_class else \
+                start_class.end+time_to_walk_dining_hall_to_end_class+BUFFER_TIME+MAX_WAIT_FOR_CLASS_TO_START
             # Time to start eating
             eat_start_time: int = dining_hall.find_best_time(available_start_time, available_stop_time, TIME_TO_EAT)
             # Is dining hall open at start time
             # Distance from start class to dining hall to end class going straight a ~> b
-            return eat_start_time - available_stop_time > TIME_TO_EAT and \
-                dining_hall.is_open_at_time(eat_start_time, TIME_TO_EAT) and \
-                dining_hall.location.get_path_distance_miles(end_class.location) + \
-                start_class.location.get_path_distance(dining_hall.location) if first_class else 0 < MAX_WALKING_DISTANCE, eat_start_time, total_distance
+            return eat_start_time and eat_start_time - available_stop_time > TIME_TO_EAT and \
+                dining_hall.is_open_at_time(eat_start_time, TIME_TO_EAT), \
+                eat_start_time, total_difference_in_distance
         return False, None, None
 
 def find_possible_food_times(user: User, classes: list[Class]) -> list[PossibleFoodTime]:
@@ -70,6 +74,12 @@ def find_possible_food_times(user: User, classes: list[Class]) -> list[PossibleF
             is_possible, start_time, distance = PossibleFoodTime.possible_location_and_time(class_data, dining_hall, next_class_data)
             if is_possible:
                 possible_food_times.append(PossibleFoodTime(dining_hall, start_time, TIME_TO_EAT, distance))
+        
+        # last class to dorm
+        is_possible, start_time, distance = PossibleFoodTime.possible_location_and_time(classes[-1], dining_hall, user.location)
+        if is_possible:
+                possible_food_times.append(PossibleFoodTime(dining_hall, start_time, TIME_TO_EAT, distance))
+        
         # Sort possible_lunch_times
         possible_food_times = sorted(possible_food_times)
     return possible_food_times
