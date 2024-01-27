@@ -27,7 +27,7 @@ class PossibleFoodTime:
         return {"dining_hall": self.dining_hall.name, "start_time": self.start_time}
         
     def __weight(self):
-        return self.distance/MAX_WALKING_DISTANCE * (1-FOOD_WEIGHT) + self.dining_hall.menu.menu_weight() * FOOD_WEIGHT
+        return (1 - (self.distance/MAX_WALKING_DISTANCE)) * (1-FOOD_WEIGHT) + self.dining_hall.menu.menu_weight() * FOOD_WEIGHT
         
     def __gt__(self, other):
         return self.__weight() > other.__weight()
