@@ -7,40 +7,15 @@ const { height, width } = Dimensions.get('screen');
 import materialTheme from '../constants/Theme';
 import Images from '../constants/Images';
 
+import MapTest from './MapTest.js'
+
 export default class Onboarding extends React.Component {
   render() {
     const { navigation } = this.props;
 
     return (
       <Block flex style={styles.container}>
-        <StatusBar barStyle="light-content" />
-        <Block flex center>
-          <ImageBackground
-            source={{uri: Images.Onboarding}}
-            style={{ height: height, width: width, marginTop: '-55%', zIndex: 1 }}
-          />
-        </Block>
-        <Block flex space="between" style={styles.padded}>
-          <Block flex space="around" style={{ zIndex: 2 }}>
-            <Block>
-              <Block>
-                <Text color="black" size={60}>Food Path</Text>
-              </Block>
-              <Text size={16} color='blue'>
-                Automatically optimize your daily routes.
-              </Text>
-            </Block>
-            <Block center>
-              <Button
-                shadowless
-                style={styles.button}
-                color={materialTheme.COLORS.BUTTON_COLOR}
-                onPress={() => navigation.navigate('App')}>
-                GET STARTED
-              </Button>
-            </Block>
-          </Block>
-        </Block>
+        <MapTest/>
       </Block>
     );
   }
