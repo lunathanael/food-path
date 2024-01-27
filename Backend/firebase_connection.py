@@ -2,12 +2,16 @@ import firebase_admin
 from firebase_admin import db
 import os
 
+RESET_USERS = False
+RESET_DINING_HALLS = False
+
 class FirebaseConnection:
 
     def __init__(self):
         self.app = self.__setup_connection()
         self.ref = db.reference()
-        # self.__init_dining_halls()
+        RESET_DINING_HALLS and self.__init_dining_halls()
+        RESET_USERS and self.__init_users()
     
     def __setup_connection(self) -> firebase_admin.App:
         # Return an app connected to the parking database
@@ -48,15 +52,16 @@ class FirebaseConnection:
         akers_menu = self.__create_menu(breakfast, lunch, dinner)
         self.__add_dining_hall("Akers", [42.724511319457186, -84.4648138643711], [700, 1500, 1630, 2100], akers_menu)
 
-    def __create_class(self, name: str, location: [int, int], time: [int, int], days: list) -> dict:
-        return {name: {"location": {"lat": location[0], "long": location[1]}, 
-                       "time": {"start": time[0], "end": time[1]}, "days": days}}
+    def __create_class(self, location: [int, int], time: [int, int], days: list) -> dict:
+        return {"location": {"lat": location[0], "long": location[1]}, 
+                       "time": {"start": time[0], "end": time[1]}, "days": days}
 
     def __add_user(self, username: str,  password: str, classes: dict) -> None:
-        self.app.child(f'users/{username}').set({"password": password, "classes": classes})
+        self.ref.child(f'users/{username}').set({"password": password, "classes": classes})
 
     def __init_users(self) -> None:
-        classes = self.__create_class("CSE 231", [42.7244946181507, -84.48848047008471], [700, 1500], [1, 3, 5])
+        classes = {"CSE 232": self.__create_class([42.72667482223444, -84.4831625150824], [1020, 1240], [5]),
+                    "CSE 260": self.__create_class([42.73057305428702, -84.48175181501252], [1500, 1620], [1, 3, 5])}
         self.__add_user("Aidan", "12345", classes)
 
     def get_user_data(self, username: str) -> dict:
