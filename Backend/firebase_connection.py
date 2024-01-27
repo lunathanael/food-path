@@ -1,12 +1,61 @@
+from __future__ import annotations
 import firebase_admin
 from firebase_admin import db
-import os
+import os, math
 
 RESET_USERS = False
 RESET_DINING_HALLS = False
 
-class FirebaseConnection:
+class Location:
+    def __init__(self, lat: float, long: float):
+        self.lat: float = lat
+        self.long: float = long
+    
+    def __init__(self, location: dict):
+        self.lat: float = location["lat"]
+        self.long: float = location["long"]
+        
+    def __lat_long_to_miles(self, degrees: float, lat: bool) -> float:
+        return degrees * (69 if lat else 54.6)
 
+    def get_distance(self, other: Location) -> float:
+        return math.hypot(self.__lat_long_to_miles(self.lat, True)-self.__lat_long_to_miles(other.lat, True),
+                          self.__lat_long_to_miles(self.long, False)-self.__lat_long_to_miles(other.long, False))
+        
+    def get_path_distance(self, other: Location) -> float:
+        return self.get_distance(other)
+
+class Class:
+    def __init__(self, name: str, location: dict[str, int], time: dict[str, int], days: list):
+        self.name: str = name
+        self.location: Location = Location(location)
+        self.start: int = time["start"]
+        self.end: int = time["end"]
+        self.days: list[int] = days
+class User:
+    def __init__(self, username: str, password: str, classes: dict, location: dict[str, int]):
+        self.username: str = username
+        self.password: str = password
+        self.classes: list[Class] = [Class(name, **class_data) for name, class_data in classes.items()]
+        self.location: Location = Location(location)       
+class Food:
+    def __init__(self, name: str, weight: float, calories: int, description: str):
+        self.name: str = name
+        self.weight: float = weight
+        self.calories: int = calories
+        self.description: str = description
+class Menu:
+    def __init__(self, breakfast: dict, lunch: dict, dinner: dict):
+        self.breakfast: list[Food] = [Food(name, **food) for name, food in breakfast.items()]
+        self.lunch: list[Food] = [Food(name, **food) for name, food in lunch.items()]
+        self.dinner: list[Food] = [Food(name, **food) for name, food in dinner.items()]
+class DiningHall:
+    def __init__(self, name: str, location: dict[str, int], hours: list, menu: dict):
+        self.name: str = name
+        self.location: Location = Location(location)
+        self.hours: list[int] = hours
+        self.menu: Menu = Menu(**menu)
+class FirebaseConnection:
     def __init__(self):
         self.app = self.__setup_connection()
         self.ref = db.reference()
@@ -56,13 +105,21 @@ class FirebaseConnection:
         return {"location": {"lat": location[0], "long": location[1]}, 
                        "time": {"start": time[0], "end": time[1]}, "days": days}
 
-    def __add_user(self, username: str,  password: str, classes: dict) -> None:
-        self.ref.child(f'users/{username}').set({"password": password, "classes": classes})
+    def __add_user(self, username: str,  password: str, classes: dict, location: [int, int]) -> None:
+        self.ref.child(f'users/{username}').set({"password": password, 
+                                                 "classes": classes, 
+                                                 "location": {"lat": location[0], "long": location[1]}})
 
     def __init_users(self) -> None:
         classes = {"CSE 232": self.__create_class([42.72667482223444, -84.4831625150824], [1020, 1240], [5]),
                     "CSE 260": self.__create_class([42.73057305428702, -84.48175181501252], [1500, 1620], [1, 3, 5])}
-        self.__add_user("Aidan", "12345", classes)
+        self.__add_user("Aidan", "12345", classes, [42.72258662612383, -84.48989148173476])
 
-    def get_user_data(self, username: str) -> dict:
-        return self.ref.child(f"users/{username}").get()
+    def get_user_data(self, username: str) -> User:
+        return User(username, **self.ref.child(f"users/{username}").get())
+
+    def get_dining_halls(self) -> list[DiningHall]:
+        return [DiningHall(name, **dining_hall) for name, dining_hall in self.ref.child("dining_halls").get().items()]
+    
+if __name__ == "__main__":
+    firebase_connection = FirebaseConnection()
