@@ -1,4 +1,4 @@
-const Onboarding = '../assets/images/test.png';//'https://images.unsplash.com/photo-1505995433366-e12047f3f144?fit=crop&w=840&q=80';
+const Onboarding = 'https://lh3.googleusercontent.com/drive-viewer/AEYmBYSMtf8GMtt2ZJDI9bmKgkASdNoPHUIYmIeBU1DocfJd76gAq2ygLB_bHcljxy5kz3XGWfsrdCzjHz6uRHXqQeWUFaOH=s2560';//'https://images.unsplash.com/photo-1505995433366-e12047f3f144?fit=crop&w=840&q=80';
 const Pro = 'https://images.unsplash.com/photo-1485796826113-174aa68fd81b?fit=crop&w=840&q=80';
 const Products = {
   'Accessories': 'https://source.unsplash.com//l1MCA0VyNrk/840x840',
