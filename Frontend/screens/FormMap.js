@@ -56,7 +56,7 @@ export default FormMap = ({isVisible, onAddLocation, onClose, setLocation}) => {
 
     const handleSetLocation = (coordinate) => {
         setLocationOpen(true);
-        setLocation(coordinate);
+        onAddLocation(coordinate);
     }
 
     return (
@@ -94,12 +94,6 @@ export default FormMap = ({isVisible, onAddLocation, onClose, setLocation}) => {
                 onPress={() => navigation.navigate('sign-in')}>
                 Manual Entry
               </Button>
-            </Block>
-          </Block>
-        </Block>
-        <Block flex space="between" style={styles.padded}>
-          <Block flex space="around" style={{ zIndex: 1 }}>
-            <Block center>
               <Button
                 shadowless
                 style={styles.button}

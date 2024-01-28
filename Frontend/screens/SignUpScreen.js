@@ -26,7 +26,7 @@ const auth = getAuth(app)
                 setEmail("")
                 setPassword("")
                 setUsername("")
-                navigation.navigate("sign-in")
+                navigation.navigate("form")
             }
             else {
                 Alert.alert('Signup Error', 'Unable to find user after signup');
