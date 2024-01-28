@@ -1,9 +1,10 @@
 from __future__ import annotations
-from bs4 import BeautifulSoup
 from firebase_admin import db
-from datetime import date
+from requests import Response
+from bs4 import BeautifulSoup
 from typing import Callable
-import os, math, urllib.request, firebase_admin
+from datetime import date
+import os, math, urllib.request, firebase_admin, requests
 
 DINING_HALLS = {'South Pointe at Case': {'html': 'South%20Pointe%20at%20Case', 'location': [42.72453932922057, -84.48844707117367], 'times': [700, 1500, 1630, 2100]}, 
                         'Sparty\'s Market': {'html': 'Sparty%27s%20market', 'location': [42.72867352001793, -84.49440369630766], 'times': [730, 1900]},
@@ -37,11 +38,28 @@ class Location:
         return math.hypot(self.__lat_long_to_miles(self.lat, True)-self.__lat_long_to_miles(other.lat, True),
                           self.__lat_long_to_miles(self.long, False)-self.__lat_long_to_miles(other.long, False))
         
+    def get_distance_and_time(self, other: Location, mode: str="walking") -> tuple[float, float]:
+        response: Response = requests.get("https://maps.googleapis.com/maps/api/distancematrix/json", params={
+            "origins": f"{self.lat},{self.long}",
+            "destinations": f"{other.lat},{other.long}",
+            "mode": mode,
+            "units": "imperial",
+            "key": "AIzaSyAKTdNuoPDpeBHQsAOv5MNnJEhS8lirgxk",
+        })
+        result: dict = response.json()
+
+        if response.status_code == 200 and result["status"] == "OK":
+            distance = result["rows"][0]["elements"][0]["distance"]["text"].split()[0]
+            duration = result["rows"][0]["elements"][0]["duration"]["text"].split()[0]
+            return float(distance), float(duration)
+        else:
+            return self.get_path_distance_miles(other), self.get_time_to_walk_minutes(other)
+        
     def get_time_to_walk_minutes(self, other: Location) -> int:
         return self.get_path_distance_miles(other) * MINUTES_PER_MILE # 15 minutes per mile
         
     def get_path_distance_miles(self, other: Location) -> float:
-        return self.get_distance_miles(other)
+        return self.get_distance_miles(other) * 1.5
 
 class Class:
     def __init__(self, name: str, location: dict[str, int], time: dict[str, int], days: list):
@@ -51,7 +69,7 @@ class Class:
         self.end: int = time["end"]
         self.days: list[int] = days
 class User:
-    def __init__(self, username: str, password: str, classes: dict, location: dict[str, int]):
+    def __init__(self, username: str, password: str, classes: dict, location: dict[str, int], food_plan: dict = None, reviews: dict = None):
         self.username: str = username
         self.password: str = password
         self.classes: list[Class] = [Class(name, **class_data) for name, class_data in classes.items()]
@@ -65,6 +83,8 @@ class Food:
         
     def to_dict(self) -> dict:
         return {"weight": self.weight, "calories": self.calories, "description": self.description}
+
+
 class Menu:
     def __init__(self, breakfast: dict = {}, lunch: dict = {}, dinner: dict = {}):
         self.breakfast: list[Food] = [Food(name, **food) for name, food in breakfast.items()]
@@ -72,9 +92,9 @@ class Menu:
         self.dinner: list[Food] = [Food(name, **food) for name, food in dinner.items()]
         
     def menu_weight(self) -> float:
-        return (sum(sorted(self.breakfast, key=lambda food: food.weight)[:5]) / 5 +
-                sum(sorted(self.lunch, key=lambda food: food.weight)[:5]) / 5 +
-                sum(sorted(self.dinner, key=lambda food: food.weight)[:5]) / 5
+        return (sum(food.weight for food in sorted(self.breakfast, key=lambda food: food.weight)[:5]) / 5 +
+                sum(food.weight for food in sorted(self.lunch, key=lambda food: food.weight)[:5]) / 5 +
+                sum(food.weight for food in sorted(self.dinner, key=lambda food: food.weight)[:5]) / 5
                 ) / 3
 
     def to_dict(self) -> dict:
@@ -183,7 +203,7 @@ class FirebaseConnection:
         classes = {"CSE 232": self.__create_class([42.72667482223444, -84.4831625150824], [1020, 1240], [5]),
                     "CSE 260": self.__create_class([42.7284703908709, -84.47829548101657], [1500, 1620], [1, 3, 5]),
                     "IAH 207": self.__create_class([42.72459681870728, -84.46473911567855], [1240, 1430], [2, 4]),
-                    "ISB 202": self.__create_class([42.73057305428702, -84.48175181501252], [1240, 1600], [1, 3]),}
+                    "ISB 202": self.__create_class([42.73057305428702, -84.48175181501252], [1240, 1400], [1, 3]),}
         self.__add_user("Aidan", "12345", classes, [42.72258662612383, -84.48989148173476])
 
     def get_user_data(self, username: str) -> tuple[User, Callable[[dict], None]]:
@@ -192,5 +212,39 @@ class FirebaseConnection:
     def get_dining_halls(self) -> list[DiningHall]:
         return [DiningHall(name, **dining_hall) for name, dining_hall in self.ref.child("dining_halls").get().items()]
     
+    def regester_listener(self):
+        users_ref = self.ref.child('users')
+        users_ref.listen(self.__on_user_change)
+    
+    def __on_user_change(self, event):
+        if event.event_type == 'patch':
+            reviews = event.data.get('reviews', {})
+            for food, liked in reviews.items():
+                self.update_food_review(food, liked)
+
+    def update_food_review(self, food_name: str, liked: bool):
+        dining_halls = self.ref.child('dining_halls')
+        for dining_hall_name, db in dining_halls.get().items():
+            menu = db.get('menu', {})
+            for foods in menu.values():
+                for food in foods:
+                    if food.get('name') == food_name:
+                        if liked:
+                            food['weight'] += 0.1
+                            food['weight'] = min(1, food['weight'])
+                        else:
+                            food['weight'] -= 0.1
+                            food['weight'] = max(0, food['weight'])
+
+        
+    #     # Use firebase admin to add listener to users
+    #     # Add listener to user reviews
+    #     # When listener is called, update food reviews
+    #     # Loop through dining hall and if the food has been reviewed update its rating
+    #     ...
+        
+
+        
+
 if __name__ == "__main__":
     firebase_connection = FirebaseConnection()

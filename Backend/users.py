@@ -2,6 +2,7 @@ from __future__ import annotations
 from firebase_connection import FirebaseConnection, User, DiningHall, Class, Menu, Food, Location
 
 MAX_WALKING_DISTANCE = 1.5 # miles
+MAX_WALK_TIME = 8 # minutes one way
 TIME_TO_EAT = 30 # minutes
 BUFFER_TIME = 10 # minutes
 MAX_WAIT_FOR_CLASS_TO_START = 15 # minutes
@@ -11,6 +12,10 @@ FOOD_WEIGHT = 0.5
 firebase_connection: FirebaseConnection = FirebaseConnection()
 dining_halls: list[DiningHall] = firebase_connection.get_dining_halls()
 
+def roll_over_time(time: int) -> int:
+    if time % 100 >= 60:
+        time += 100 - 60
+    return time
 class PossibleFoodTime:
     def __init__(self, dining_hall: DiningHall, start_time: int, duration: int, distance: float) -> None:
         self.dining_hall: DiningHall = dining_hall
@@ -22,7 +27,13 @@ class PossibleFoodTime:
         return {"dining_hall": self.dining_hall.name, "start_time": self.start_time}
         
     def __weight(self):
-        return self.distance/MAX_WALKING_DISTANCE * (1-FOOD_WEIGHT) + self.dining_hall.menu.menu_weight() * FOOD_WEIGHT
+        return (1 - (self.distance/MAX_WALKING_DISTANCE)) * (1-FOOD_WEIGHT) + self.dining_hall.menu.menu_weight() * FOOD_WEIGHT
+        
+    def __gt__(self, other):
+        return self.__weight() > other.__weight()
+        
+    def __lt__(self, other):
+        return self.__weight() < other.__weight()
         
     def __cmp__(self, other: PossibleFoodTime) -> int:
         return -1 if self.__weight() < other.__weight() else int(self.__weight() > other.__weight())
@@ -43,8 +54,10 @@ class PossibleFoodTime:
                                             start_class.location.get_distance_miles(end_class.location)
         if total_difference_in_distance < MAX_WALKING_DISTANCE:
             # Time to walk from class to dining hall and vice versa to end class going a ~> b
-            time_to_walk_start_class_to_dining_hall: int = start_class.location.get_time_to_walk_minutes(dining_hall.location)
-            time_to_walk_dining_hall_to_end_class: int = dining_hall.location.get_time_to_walk_minutes(end_class.location)
+            distance_to_walk_start_class_to_dining_hall, time_to_walk_start_class_to_dining_hall = \
+                start_class.location.get_distance_and_time(dining_hall.location)
+            distance_to_walk_dining_hall_to_start_class, time_to_walk_dining_hall_to_end_class = \
+                dining_hall.location.get_distance_and_time(end_class.location)
             # Time available to start eating
             available_start_time = start_class.end+BUFFER_TIME+time_to_walk_start_class_to_dining_hall if not first_class else \
                 end_class.start-time_to_walk_start_class_to_dining_hall-BUFFER_TIME-MAX_WAIT_FOR_CLASS_TO_START-TIME_TO_EAT
@@ -56,8 +69,9 @@ class PossibleFoodTime:
             # Is dining hall open at start time
             # Distance from start class to dining hall to end class going straight a ~> b
             return eat_start_time and available_stop_time - eat_start_time >= TIME_TO_EAT and \
+                time_to_walk_dining_hall_to_end_class <= MAX_WALK_TIME and time_to_walk_start_class_to_dining_hall <= MAX_WALK_TIME and \
                 dining_hall.is_open_at_time(eat_start_time, TIME_TO_EAT), \
-                eat_start_time, total_difference_in_distance
+                roll_over_time(eat_start_time), distance_to_walk_start_class_to_dining_hall + distance_to_walk_dining_hall_to_start_class
         return False, None, None
 
 def find_possible_food_times(user: User, classes: list[Class]) -> list[PossibleFoodTime]:
