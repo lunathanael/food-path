@@ -110,13 +110,13 @@ const ModalComponent = ({ isVisible, onAddClass, onClose }) => {
     setShow1(true);
   };
 
-  
+
   const [location, setLocation] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
 
   const handleAddLocation = (MapLocation) => {
-    //setClasses(prevClasses => [...prevClasses, newClassName]);
-    setModalVisible(false);
+    setLocation(MapLocation);
+    console.log(MapLocation);
   };
 
   return (
@@ -159,6 +159,7 @@ const ModalComponent = ({ isVisible, onAddClass, onClose }) => {
             isVisible={isModalVisible}
             onAddLocation={handleAddLocation}
             onClose={() => setModalVisible(false)}
+            setLocation={setLocation}
         />
 
         <Button title="Add" onPress={handleSave} />

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Modal, View, ImageBackground, StyleSheet, StatusBar, Dimensions } from 'react-native';
+import React, {useState} from 'react';
+import { Modal, View, ImageBackground, StyleSheet, Dimensions } from 'react-native';
 import { Block, Button, Text, theme } from 'galio-framework';
 
 const { height, width } = Dimensions.get('screen');
@@ -36,7 +36,9 @@ const mapCustomStyle = [
 ];
   
 
-export default FormMap = ({isVisible, onAddLocation, onClose}) => {
+export default FormMap = ({isVisible, onAddLocation, onClose, setLocation}) => {
+
+    const [locationOpen, setLocationOpen] = useState(false);
 
     this.state = {
       region: {
@@ -50,6 +52,11 @@ export default FormMap = ({isVisible, onAddLocation, onClose}) => {
 
     for (const hall in DINING_HALLS_LOCATIONS) {
       this.state.markers.push({'key' : hall, 'coordinate': {'latitude': DINING_HALLS_LOCATIONS[hall][0], 'longitude': DINING_HALLS_LOCATIONS[hall][1]}});
+    }
+
+    const handleSetLocation = (coordinate) => {
+        setLocationOpen(true);
+        setLocation(coordinate);
     }
 
     return (
@@ -71,7 +78,7 @@ export default FormMap = ({isVisible, onAddLocation, onClose}) => {
                 coordinate={marker.coordinate}
                 icon={require('../assets/icons/foodIcon.png')}
                 onPress={() => {
-                  console.log('callout pressed');
+                  handleSetLocation(marker.coordinate)
                 }}>
               </Marker>
             ))}
@@ -86,6 +93,19 @@ export default FormMap = ({isVisible, onAddLocation, onClose}) => {
                 color={materialTheme.COLORS.BUTTON_COLOR}
                 onPress={() => navigation.navigate('sign-in')}>
                 Manual Entry
+              </Button>
+            </Block>
+          </Block>
+        </Block>
+        <Block flex space="between" style={styles.padded}>
+          <Block flex space="around" style={{ zIndex: 1 }}>
+            <Block center>
+              <Button
+                shadowless
+                style={styles.button}
+                color={materialTheme.COLORS.BUTTON_COLOR}
+                onPress={onClose}>
+                Finish
               </Button>
             </Block>
           </Block>
