@@ -1,8 +1,20 @@
-import React, {useState} from 'react';
-import { View, Text, TextInput, StyleSheet, Button, Dimensions} from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Button,
+  Dimensions,
+  Image,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
 
-const { height, width } = Dimensions.get('screen');
-import { HeaderHeight } from "../constants/utils";
+const screenheight = Dimensions.get('screen').height;
+const screenwidth = Dimensions.get('screen').width;
+import { HeaderHeight } from '../constants/utils';
 
 export default function ProScreen({navigation}) {
   const [username, setUsername] = useState("")
@@ -13,7 +25,7 @@ export default function ProScreen({navigation}) {
   };
 
   const handleSignUp = () => {
-    navigation.navigate("Sign up")
+    navigation.navigate("sign-up")
   };
 
   return (
@@ -50,28 +62,47 @@ export default function ProScreen({navigation}) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
+  image: {
+    flex: 0.6,
+    justifyContent: 'center',
+    width: screenwidth,
   },
-  inputContainer: {
-    width: '100%',
-    marginBottom: 16,
+  info: {
+    flex: 0.5,
+    alignItems: 'center',
+    backgroundColor: '#7954A1',
+    width: screenwidth,
+    paddingTop: 30,
   },
   input: {
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 8,
-    marginBottom: 8,
-    paddingLeft: 8,
+    marginTop: 10,
+    marginBottom: 3,
+    paddingLeft: 10,
+    width: 300,
+    backgroundColor: '#FFFFFF',
+    color: '#000000',
+    fontWeight: 0.8,
+  },
+  button: {
+    height: 40,
+    width: 120,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 8,
+    marginTop: 10,
+    marginBottom: 3,
+    marginLeft: 10,
+    marginRight: 10,
   },
 });
