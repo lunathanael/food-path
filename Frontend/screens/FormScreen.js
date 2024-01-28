@@ -21,13 +21,13 @@ const firebaseConfig = {
 
 
 
-const YourScreen = ({navigation, route}) => {
+const YourScreen = ({route, navigation}) => {
   const [classes, setClasses] = useState({});
   const [isModalVisible, setModalVisible] = useState(false);
 
-  const username = route.params.username;
+  const {username} = route.params;
 
-  const handleAddClass = (className, classInfo) => {
+  const handleAddClass = ({className, classInfo}) => {
 
     setClasses(prevClasses => ({...prevClasses, 'ClassName': classInfo}));
 

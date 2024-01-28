@@ -12,7 +12,7 @@ import { HeaderHeight } from "../constants/utils";
 
 const auth = getAuth(app)
 
-export default function ProScreen({ navigation, route }) {
+export default function ProScreen({ navigation }) {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [email, setEmail] = useState("")
@@ -23,7 +23,7 @@ export default function ProScreen({ navigation, route }) {
     navigation.navigate("sign-in")
   };
 
-  const handleSignUp = async (username) => {
+  const handleSignUp = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password).then(async (userCredential) => {
         if (userCredential.user) {
@@ -35,7 +35,7 @@ export default function ProScreen({ navigation, route }) {
           try {
             await signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
               if (userCredential.user) {
-                navigation.navigate("form", {'username': username})
+                navigation.navigate("form", {username: {username}})
               }
             });
           }
@@ -81,6 +81,13 @@ export default function ProScreen({ navigation, route }) {
               <TextInput
                 style={styles.input}
                 placeholderTextColor="#7954A1"
+                placeholder="Username"
+                value={username}
+                onChangeText={setUsername}
+              />
+              <TextInput
+                style={styles.input}
+                placeholderTextColor="#7954A1"
                 placeholder="Email"
                 value={email}
                 onChangeText={setEmail}
@@ -93,15 +100,8 @@ export default function ProScreen({ navigation, route }) {
                 value={password}
                 onChangeText={setPassword}
               />
-              <TextInput
-                style={styles.input}
-                placeholderTextColor="#7954A1"
-                placeholder="Username"
-                value={username}
-                onChangeText={setUsername}
-              />
               <View style={styles.button}>
-                <Button title="Sign up" onPress={() => (handleSignUp(username))} color="#C55FFC" />
+                <Button title="Sign up" onPress={handleSignUp} color="#C55FFC" />
               </View>
               <View style={styles.button}>
                 <Button title="Log into Existing Account" onPress={handleLogin} color="#C55FFC" />

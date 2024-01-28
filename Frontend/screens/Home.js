@@ -115,7 +115,7 @@ const Waiting_Driver_Screen = ({db, username}) => {
 };
 
 
-export default Home = (navigation, route) => {
+export default Home = ({route}) => {
   const db = route.params.db;
   const username = route.params.username;
   return (

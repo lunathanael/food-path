@@ -12,7 +12,7 @@ import { app } from "../firebase"
 
 const auth = getAuth(app)
 
-  export default function ProScreen({navigation, route}) {
+  export default function ProScreen({route, navigation}) {
     const [username, setUsername] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
