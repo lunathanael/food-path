@@ -1,100 +1,67 @@
-import React from 'react';
-import { ImageBackground, Image, StyleSheet, StatusBar, Dimensions, Platform } from 'react-native';
-import { Block, Button, Text, theme } from 'galio-framework';
-import { LinearGradient } from 'expo-linear-gradient';
+import React, {useState} from 'react';
+import { View, Text, TextInput, StyleSheet, Button, Dimensions} from 'react-native';
 
 const { height, width } = Dimensions.get('screen');
-import { Images, materialTheme } from '../constants/';
 import { HeaderHeight } from "../constants/utils";
 
-export default class Pro extends React.Component {
-  render() {
-    const { navigation } = this.props;
+  export default function Pro({navigation}) {
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+
+    const handleLogin = () => {
+      navigation.navigate("Home")
+    }
 
     return (
-      <Block flex style={styles.container}>
-        <StatusBar barStyle="light-content" />
-        <Block flex>
-          <ImageBackground
-            source={{ uri: Images.Pro }}
-            style={{ height: height / 1.8, width, zIndex: 1 }}
-          >
-          <LinearGradient
-            style={styles.gradient}
-            colors={['rgba(0,0,0,0)', 'rgba(0,0,0,1)']} />
-          </ImageBackground>
-          <Block space="between" style={styles.padded}>
-            <Block>
-              <Block >
-                <Block>
-                  <Text color="white" size={60}>Unlock</Text>
-                </Block>
-                <Block>
-                  <Text color="white" size={60}>Material</Text>
-                </Block>
-                <Block row>
-                  <Text color="white" size={60}>Kit</Text>
-                  <Block middle style={styles.pro}>
-                    <Text size={16} color="white">PRO</Text>
-                  </Block>
-                </Block>
-              </Block>
-              <Text size={16} color='rgba(255,255,255,0.6)'>
-                Take advantage of all the features and screens made upon Galio Design System, coded on React Native for both.
-              </Text>
-              <Block row style={{ marginTop: theme.SIZES.BASE * 1.5, marginBottom: theme.SIZES.BASE * 4 }}>
-                <Image
-                  source={require('../assets/images/ios.png')}
-                  style={{ height: 38, width: 82, marginRight: theme.SIZES.BASE * 1.5 }} />
-                <Image
-                  source={require('../assets/images/android.png')}
-                  style={{ height: 38, width: 140 }} />
-              </Block>
-              <Button
-                shadowless
-                style={styles.button}
-                color={materialTheme.COLORS.BUTTON_COLOR}
-                onPress={() => navigation.navigate('Home')}>
-                GET PRO VERSION
-              </Button>
-            </Block>
-          </Block>
-        </Block>
-      </Block>
-    );
-  }
-}
+        <View style={styles.container}>
+        <Text style={styles.title}>Login</Text>
 
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Username"
+            value={username}
+            onChangeText={setUsername}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+        </View>
+
+        <Button
+          title="Login"
+          onPress={handleLogin}
+          color="#3498db"
+        />
+      </View>
+    );
+}
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "black",
-    marginTop: Platform.OS === 'android' ? -HeaderHeight : 0,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
   },
-  padded: {
-    paddingHorizontal: theme.SIZES.BASE * 2,
-    zIndex: 3,
-    position: 'absolute',
-    bottom: Platform.OS === 'android' ? theme.SIZES.BASE * 2 : theme.SIZES.BASE * 3,
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
   },
-  button: {
-    width: width - theme.SIZES.BASE * 4,
-    height: theme.SIZES.BASE * 3,
-    shadowRadius: 0,
-    shadowOpacity: 0,
+  inputContainer: {
+    width: '100%',
+    marginBottom: 16,
   },
-  pro: {
-    backgroundColor: materialTheme.COLORS.LABEL,
-    paddingHorizontal: 8,
-    marginLeft: 12,
-    borderRadius: 2,
-    height: 22
-  },
-  gradient: {
-    zIndex: 1,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 66,
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 8,
+    paddingLeft: 8,
   },
 });

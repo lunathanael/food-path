@@ -294,7 +294,7 @@ function AppStack(props) {
       />
       <Drawer.Screen
         name="Sign In"
-        component={LoginScreenWrapper}
+        component={ProScreen}
         options={{
           drawerIcon: ({ focused }) => (
             <Icon
