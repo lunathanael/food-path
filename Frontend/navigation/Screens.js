@@ -5,10 +5,14 @@ import { Images, materialTheme } from "../constants/";
 
 import CustomDrawerContent from "./Menu";
 import HomeScreen from "../screens/Home";
+
 import OnboardingScreen from "../screens/Onboarding";
+
 import ProScreen from "../screens/ProScreen";
 import SignUpScreen from "../screens/SignUpScreen";
+
 import FormScreen from "../screens/FormScreen";
+
 import ProfileScreen from "../screens/Profile";
 import React from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -158,24 +162,6 @@ function FormScreenStack(props) {
   );
 }
 
-function SignUpScreenStack(props) {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        mode: "card",
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen
-        name="sign-up"
-        component={SignUpScreen}
-        option={{
-          headerTransparent: true,
-        }}
-      />
-    </Stack.Navigator>
-  );
-}
 
 function ProScreenStack(props) {
   return (
@@ -192,7 +178,7 @@ function ProScreenStack(props) {
           headerTransparent: true,
         }}
       />
-      <Stack.Screen name="sign-up" component={SignUpScreenStack}/>
+      <Stack.Screen name="sign-up" component={SignUpScreen}/>
     </Stack.Navigator>
   );
 }
