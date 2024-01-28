@@ -12,7 +12,7 @@ try {
   app = getApp()
 } catch(error) {
   const firebaseConfig = {
-    apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+    apiKey: "AIzaSyCjYzQ8JfadVxf6llSikhjiEfpX-Lbg4iQ",
     authDomain: "food-path-24322.firebaseapp.com",
     databaseURL: "https://food-path-24322-default-rtdb.firebaseio.com",
     projectId: "food-path-24322",

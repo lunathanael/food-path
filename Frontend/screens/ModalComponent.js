@@ -39,7 +39,7 @@ const DaySelector = ({selectedDays, setSelectedDays}) => {
       flexWrap: 'wrap',
       justifyContent: 'center',
       alignItems: 'center',
-    },
+          },
     dayButton: {
       padding: 10,
       margin: 5,
