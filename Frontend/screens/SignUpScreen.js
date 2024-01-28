@@ -93,6 +93,14 @@ export default function ProScreen({ navigation, route }) {
                 value={password}
                 onChangeText={setPassword}
               />
+              <TextInput
+                style={styles.input}
+                placeholderTextColor="#7954A1"
+                placeholder="Password"
+                secureTextEntry
+                value={username}
+                onChangeText={setUsername}
+              />
               <View style={styles.button}>
                 <Button title="Sign up" onPress={handleSignUp} color="#C55FFC" />
               </View>
