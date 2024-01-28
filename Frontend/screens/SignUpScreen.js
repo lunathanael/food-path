@@ -97,7 +97,6 @@ export default function ProScreen({ navigation, route }) {
                 style={styles.input}
                 placeholderTextColor="#7954A1"
                 placeholder="Password"
-                secureTextEntry
                 value={username}
                 onChangeText={setUsername}
               />
