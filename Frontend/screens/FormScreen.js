@@ -16,7 +16,8 @@ const YourScreen = ({navigation}) => {
 
     return (
       <>
-        <Text>{item.className}, {item.timeName}</Text>
+        <Text>{item.className}</Text>
+        <Text>Start Time: {item.start_time}, End Time: {item.end_time}</Text>
         <View>
         {item.selectedDays.map(dayId => (
           <Text>{daysOfWeek[dayId]}</Text>

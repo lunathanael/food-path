@@ -76,7 +76,7 @@ const ModalComponent = ({ isVisible, onAddClass, onClose }) => {
 
 
   const handleSave = () => {
-    onAddClass({'className': className, 'start-time': time, 'end-time':time1, 'selectedDays': selectedDays});
+    onAddClass({'className': className, 'start_time': time, 'end_time':time1, 'selectedDays': selectedDays});
     setClassName('');
 
     setDate(new Date(Date.now()));
