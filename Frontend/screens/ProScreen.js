@@ -88,7 +88,6 @@ const auth = getAuth(app)
       flex: 0.9,
       width: screenwidth,
       height: 'auto',
-      justifyContent: 'top',
     },
     inputContainer: {
       width: '100%',

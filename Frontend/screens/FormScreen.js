@@ -24,12 +24,12 @@ const YourScreen = ({navigation}) => {
 
     return (
       <>
-        <Text>{item.Name}</Text>
-        <Text>Start Time: {item.StartTime}, End Time: {item.EndTime}</Text>
-        <Text>Coordinates: {item.Longitude}, {item.Latitude}</Text>
+        <Text>{item.name}</Text>
+        <Text>Start Time: {item.time.start}, End Time: {item.time.end}</Text>
+        <Text>Coordinates: {item.location.long}, {item.laction.lat}</Text>
         <View>
-        {item.DaysOfWeek.map(dayId => (
-          <Text>{daysOfWeek[dayId]}</Text>
+        {item.days.map(dayId => (
+          <Text>{days[dayId]}</Text>
         ))}
       </View>
       </>

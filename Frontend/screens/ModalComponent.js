@@ -79,12 +79,18 @@ const ModalComponent = ({ isVisible, onAddClass, onClose }) => {
 
   const handleSave = () => {
     onAddClass({
-    'Name': className, 
-    'StartTime': time,
-    'EndTime': time1, 
-    'DaysOfWeek': selectedDays, 
-    'Longitude' : location.longitude, 
-    'Latitude': location.latitude});
+    'name': className, 
+    'time':
+    {
+        'start': time,
+        'end': time1
+    },
+    'days': selectedDays, 
+    'location': {
+        'lat':location.latitude,
+        'long':location.longitude
+    },
+    })
 
     setClassName('');
     setDate(new Date(Date.now()));
