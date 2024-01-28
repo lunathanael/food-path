@@ -9,6 +9,7 @@ import locationData from '../constants/locationData';
 
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import * as Location from "expo-location";
+import { TextInput } from 'react-native';
 
 const BUILDING_LOCATIONS = locationData.BUILDING_LOCATIONS;
 
@@ -105,10 +106,40 @@ const Waiting_Driver_Screen = ({handleSetLocation, mapCustomStyle, onMapPress}) 
     );
 };
   
+const ManualEntry = ({isVisible, onAddLocation, onClose}) => {
+    const [longitude, setLongitude] = useState("");
+    const [latitude, setLatitude] = useState("");
 
-export default FormMap = ({isVisible, onAddLocation, onClose, setLocation}) => {
+    return (
+        <Modal visible={isVisible}>
+            <TextInput
+                placeholder="Longitude"
+                value={longitude}
+                onChangeText={setLongitude}
+            />
+            <TextInput
+                placeholder="Latitude"
+                value={latitude}
+                onChangeText={setLatitude}
+            />
+            <Button onPress={() => {
+                onAddLocation({'key':'custom','coordinates':{'longitude':parseFloat(longitude), 'latitude':parseFloat(latitude)}});
+                setLongitude("");
+                setLatitude("");
+                onClose();
+            }}>
+                Save and Exit
+            </Button>
+        </Modal>
+    );
+}
+
+export default FormMap = ({isVisible, onAddLocation, onClose}) => {
 
     const [locationOpen, setLocationOpen] = useState(false);
+
+    const [modalVisible, setModalVisible] = useState(false);
+
 
     const handleSetLocation = (coordinate) => {
         setLocationOpen(true);
@@ -117,6 +148,11 @@ export default FormMap = ({isVisible, onAddLocation, onClose, setLocation}) => {
 
     return (
     <Modal visible={isVisible} onRequestClose={onClose} animationType="slide">
+      <ManualEntry
+        isVisible={modalVisible}
+        onAddLocation={handleSetLocation}
+        onClose={() => {setModalVisible(false)}}/>
+        
       <Block flex style={styles.container}>
         
         <Block flex center>
@@ -139,7 +175,7 @@ export default FormMap = ({isVisible, onAddLocation, onClose, setLocation}) => {
                 shadowless
                 style={styles.button}
                 color={materialTheme.COLORS.BUTTON_COLOR}
-                onPress={() => navigation.navigate('sign-in')}>
+                onPress={() => setModalVisible(true)}>
                 Manual Entry
               </Button>
             </Block>
