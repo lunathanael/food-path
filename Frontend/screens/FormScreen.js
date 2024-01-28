@@ -26,7 +26,7 @@ const YourScreen = ({navigation}) => {
       <>
         <Text>{item.name}</Text>
         <Text>Start Time: {item.time.start}, End Time: {item.time.end}</Text>
-        <Text>Coordinates: {item.location.long}, {item.laction.lat}</Text>
+        <Text>Coordinates: {item.location.long}, {item.location.lat}</Text>
         <View>
         {item.days.map(dayId => (
           <Text>{days[dayId]}</Text>
