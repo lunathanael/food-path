@@ -142,8 +142,10 @@ export default FormMap = ({isVisible, onAddLocation, onClose}) => {
 
 
     const handleSetLocation = (coordinate) => {
-        setLocationOpen(true);
-        onAddLocation(coordinate);
+        if (coordinate.longitude && coordinate.latitude) {
+            setLocationOpen(true);
+            onAddLocation(coordinate);
+        }
     }
 
     return (
