@@ -2,43 +2,45 @@ import React, {useState} from 'react';
 import { View, Text, TextInput, StyleSheet, Button, Dimensions} from 'react-native';
 
 const { height, width } = Dimensions.get('screen');
-import { HeaderHeight } from "../constants/utils";
 
-  export default function FormScreen({navigation}) {
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
 
-    const handleLogin = () => {
-      navigation.navigate("app")
-    };
 
-    return (
-        <View style={styles.container}>
-        <Text style={styles.title}>Class Form</Text>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-        </View>
+export default function FormScreen({navigation}) {
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
 
-        <Button
-          title="Login"
-          onPress={handleLogin}
-          color="#3498db"
+  const handleLogin = () => {
+    navigation.navigate('app')
+  };
+
+  return (
+      <View style={styles.container}>
+      <Text style={styles.title}>Class Form</Text>
+
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
         />
       </View>
-    );
+
+      <Button
+        title="Login"
+        onPress={handleLogin}
+        color="#3498db"
+      />
+    </View>
+  );
 }
 const styles = StyleSheet.create({
   container: {
