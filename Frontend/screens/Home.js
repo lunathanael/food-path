@@ -8,7 +8,18 @@ import * as Location from "expo-location";
 
 //import PathRouting from '../components/PathRouting'
 
-const PathRouting = (user) => (
+const PathRouting = (db, username) => (
+  // let p;
+  // get(child(db, `users/${username}/food_plan/path`)).then((snapshot) => {
+  //   if (snapshot.exists()) {
+  //     return (snapshot.val());
+  //   } else {
+  //     console.log("No data available");
+  //   }
+  // }).catch((error) => {
+  //   console.error(error);
+  // });
+  
   {
   'targets':
     [
@@ -22,8 +33,31 @@ const PathRouting = (user) => (
     "32",
   }
 );
+const mapCustomStyle = [ 
+  { "elementType": "geometry", "stylers": [ { "color": "#242f3e" } ] }, 
+  { "elementType": "elements", "stylers": [ { "color": "#242f3e" } ] }, 
+  { "elementType": "labels.text.fill", "stylers": [ { "color": "#746855", "visibility": "off"  } ] }, 
+  { "elementType": "labels.text.stroke", "stylers": [ { "color": "#242f3e", "visibility": "off"  } ] }, 
+  { "featureType": "administrative.locality", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563", "visibility": "off"  } ] }, 
+  { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563", "visibility": "off" } ] }, 
+  { "featureType": "poi.park", "elementType": "geometry", "stylers": [ { "color": "#263c3f", "visibility": "off" } ] }, 
+  { "featureType": "poi.park", "elementType": "labels.text.fill", "stylers": [ { "color": "#6b9a76", "visibility": "off" } ] }, 
+  { "featureType": "poi.school", "elementType": "labels.text.fill", "stylers": [ { "color": "#6b9a76", "visibility": "off" } ] }, 
+  { "featureType": "poi.school", "elementType": "geometry", "stylers": [ { "color": "#263c3f", "visibility": "off" } ] }, 
+  { "featureType": "road", "elementType": "geometry", "stylers": [ { "color": "#38414e" } ] }, 
+  { "featureType": "road", "elementType": "geometry.stroke", "stylers": [ { "color": "#212a37" } ] }, 
+  { "featureType": "road", "elementType": "labels.text.fill", "stylers": [ { "color": "#9ca5b3" } ] }, 
+  { "featureType": "road.highway", "elementType": "geometry", "stylers": [ { "color": "#746855" } ] }, 
+  { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [ { "color": "#1f2835" } ] }, 
+  { "featureType": "road.highway", "elementType": "labels.text.fill", "stylers": [ { "color": "#f3d19c" } ] }, 
+  { "featureType": "transit", "elementType": "geometry", "stylers": [ { "color": "#2f3948", "visibility": "off"  } ] }, 
+  { "featureType": "transit.station", "elementType": "labels.text.fill", "stylers": [ { "color": "#d59563", "visibility": "off"  } ] }, 
+  { "featureType": "water", "elementType": "geometry", "stylers": [ { "color": "#17263c" } ] }, 
+  { "featureType": "water", "elementType": "labels.text.fill", "stylers": [ { "color": "#515c6d" } ] }, 
+  { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [ { "color": "#17263c" } ] } 
+];
 
-const Waiting_Driver_Screen = ({handleSetLocation, mapCustomStyle, onMapPress}) => {
+const Waiting_Driver_Screen = ({db, username}) => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [initialRegion, setInitialRegion] = useState(null);
 
@@ -32,7 +66,7 @@ const Waiting_Driver_Screen = ({handleSetLocation, mapCustomStyle, onMapPress}) 
     const getLocation = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
 
-      let routingInfo = PathRouting(0);
+      let routingInfo = PathRouting(db, username);
 
 
       let location = {'coords': {'latitude': 42.7229439975, 'longitude': -84.4792321495}};
@@ -81,15 +115,14 @@ const Waiting_Driver_Screen = ({handleSetLocation, mapCustomStyle, onMapPress}) 
 };
 
 
-export default class Home extends React.Component {
-
-  render() {
-    return (
-      <Block flex center style={styles.home}>
-        <Waiting_Driver_Screen/>
-      </Block>
-    );
-  }
+export default Home = (navigation, route) => {
+  const db = route.params.db;
+  const username = route.params.username;
+  return (
+    <Block flex center style={styles.home}>
+      <Waiting_Driver_Screen db={db} username={username}/>
+    </Block>
+  );
 }
 
 const styles = StyleSheet.create({

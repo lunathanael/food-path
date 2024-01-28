@@ -112,6 +112,7 @@ function AppStack(props) {
     >
       <Drawer.Screen
         name="Home"
+        initialParams={{ params: route.params }}
         component={HomeStack}
         options={{
           drawerIcon: ({ focused }) => (

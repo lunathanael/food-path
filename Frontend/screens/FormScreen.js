@@ -38,7 +38,7 @@ const YourScreen = ({navigation, route}) => {
   // GET DATA
   const app = initializeApp(firebaseConfig);
   const db = ref(getDatabase(app));
-  get(child(dbRef, `users/Aidan/classes/CSE 232`)).then((snapshot) => {
+  get(child(db, `users/Aidan/classes/CSE 232`)).then((snapshot) => {
     if (snapshot.exists()) {
       console.log(snapshot.val());
     } else {
@@ -75,7 +75,7 @@ const YourScreen = ({navigation, route}) => {
   const handleSaveClasses = async () => {
     set(ref(db, `users/${username}/`), classes);
 
-    navigation.navigate('app', {});
+    navigation.navigate('app', {'username':username, 'db':db});
   }
 
   return (
