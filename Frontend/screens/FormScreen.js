@@ -38,12 +38,7 @@ const YourScreen = ({navigation}) => {
 
   const handleSaveClasses = async () => {
     try {
-      const classes_t = classes
-      classes.forEach((classItem, index) => {
-        console.log(classItem)
-        const docRef = addDoc(collection(db, 'classes'), classItem);
-        console.log(docRef.id)
-      });
+      const docRef = await addDoc(collection(db, 'Schedule'), {'Classes': classes});
     }
     catch (e) {
       console.error("Error adding document: ", e);
