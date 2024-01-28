@@ -10,7 +10,7 @@ import locationData from '../constants/locationData';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import * as Location from "expo-location";
 
-const DINING_HALLS_LOCATIONS = locationData.DINING_HALLS_LOCATIONS;
+const BUILDING_LOCATIONS = locationData.BUILDING_LOCATIONS;
 
 const mapCustomStyle = [ 
   { "elementType": "geometry", "stylers": [ { "color": "#242f3e" } ] }, 
@@ -41,8 +41,8 @@ const Waiting_Driver_Screen = ({handleSetLocation, mapCustomStyle, onMapPress}) 
     const [initialRegion, setInitialRegion] = useState(null);
     const markers = [];
 
-    for (const hall in DINING_HALLS_LOCATIONS) {
-      markers.push({'key' : hall, 'coordinate': {'latitude': DINING_HALLS_LOCATIONS[hall][0], 'longitude': DINING_HALLS_LOCATIONS[hall][1]}});
+    for (const hall in BUILDING_LOCATIONS) {
+      markers.push({'key' : hall, 'coordinate': {'latitude': BUILDING_LOCATIONS[hall][0], 'longitude': BUILDING_LOCATIONS[hall][1]}});
     }
   
     useEffect(() => {
@@ -110,20 +110,6 @@ export default FormMap = ({isVisible, onAddLocation, onClose, setLocation}) => {
 
     const [locationOpen, setLocationOpen] = useState(false);
 
-    this.state = {
-      region: {
-        latitude: 42.7229439975,
-        longitude: -84.4792321495,
-        latitudeDelta: 0.0422,
-        longitudeDelta: 0.0221,
-      },
-      markers: [],
-    };
-
-    for (const hall in DINING_HALLS_LOCATIONS) {
-      this.state.markers.push({'key' : hall, 'coordinate': {'latitude': DINING_HALLS_LOCATIONS[hall][0], 'longitude': DINING_HALLS_LOCATIONS[hall][1]}});
-    }
-
     const handleSetLocation = (coordinate) => {
         setLocationOpen(true);
         onAddLocation(coordinate);
@@ -138,26 +124,6 @@ export default FormMap = ({isVisible, onAddLocation, onClose, setLocation}) => {
             handleSetLocation={handleSetLocation} 
             mapCustomStyle={mapCustomStyle} 
             onMapPress={this.onMapPress}/>
-          {/* <MapView
-            provider={PROVIDER_GOOGLE}
-            style={styles.map}
-            initialRegion={this.state.region}
-            customMapStyle={mapCustomStyle}
-            onPress={this.onMapPress}
-            showsUserLocation={true}>
-              
-            {this.state.markers.map((marker) => (
-              <Marker
-                title={marker.key}
-                key={marker.key}
-                coordinate={marker.coordinate}
-                icon={require('../assets/icons/foodIcon.png')}
-                onPress={() => {
-                  handleSetLocation(marker.coordinate)
-                }}>
-              </Marker>
-            ))}
-          </MapView> */}
         </Block>
         <Block flex space="between" style={styles.padded}>
           <Block flex space="around" style={{ zIndex: 1 }}>
