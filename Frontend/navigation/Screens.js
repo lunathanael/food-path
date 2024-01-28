@@ -7,14 +7,13 @@ import ComponentsScreen from "../screens/Components";
 import CustomDrawerContent from "./Menu";
 import HomeScreen from "../screens/Home";
 import OnboardingScreen from "../screens/Onboarding";
-import ProScreen from "../screens/Pro";
+import ProScreen from "../screens/ProScreen";
 import ProfileScreen from "../screens/Profile";
 import React from "react";
 import SettingsScreen from "../screens/Settings";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Provider } from "react-redux"
-import LoginScreenWrapper from "../screens/LoginScreen";
+import { NavigationContainer } from '@react-navigation/native';
 
 const { width } = Dimensions.get("screen");
 
@@ -299,7 +298,7 @@ function AppStack(props) {
           drawerIcon: ({ focused }) => (
             <Icon
               size={16}
-              name="ios-log-in"
+              name="sign-in"
               family="ionicon"
               color={focused ? "white" : materialTheme.COLORS.MUTED}
             />
@@ -324,7 +323,27 @@ function AppStack(props) {
   );
 }
 
-export default function OnboardingStack(props) {
+function ProScreenStack(props) {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        mode: "card",
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen
+        name="sign-in"
+        component={ProScreen}
+        option={{
+          headerTransparent: true,
+        }}
+      />
+      <Stack.Screen name="app" component={AppStack} />
+    </Stack.Navigator>
+  );
+}
+
+function OnboardingStack(props) {
   return (
     <Stack.Navigator
       screenOptions={{
@@ -339,10 +358,18 @@ export default function OnboardingStack(props) {
           headerTransparent: true,
         }}
       />
-      <Stack.Screen name="App" component={AppStack} />
+      <Stack.Screen name="sign-in" component={ProScreenStack} />
     </Stack.Navigator>
   );
 }
+
+const OnboardingContainer = () => (
+  <NavigationContainer>
+    createAppContainer(OnboardingStack);
+  </NavigationContainer>
+);
+
+export default OnboardingStack;
 
 /*
 const ProfileStack = createStackNavigator({

@@ -4,13 +4,13 @@ import { View, Text, TextInput, StyleSheet, Button, Dimensions} from 'react-nati
 const { height, width } = Dimensions.get('screen');
 import { HeaderHeight } from "../constants/utils";
 
-  export default function Pro({navigation}) {
+  export default function ProScreen({navigation}) {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
 
     const handleLogin = () => {
-      navigation.navigate("Home")
-    }
+      navigation.navigate("app")
+    };
 
     return (
         <View style={styles.container}>
