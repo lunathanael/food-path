@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Button, Modal, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import FormMap from './FormMap';
 
 const DaySelector = ({selectedDays, setSelectedDays}) => {
     const daysofWeekId = [0, 1, 2, 3, 4, 5, 6];
@@ -77,8 +78,6 @@ const ModalComponent = ({ isVisible, onAddClass, onClose }) => {
 
   const handleSave = () => {
     onAddClass({'className': className, 'start_time': time, 'end_time':time1, 'selectedDays': selectedDays});
-    console.log(date);
-    console.log(date1);
     setClassName('');
 
     setDate(new Date(Date.now()));
@@ -106,11 +105,19 @@ const ModalComponent = ({ isVisible, onAddClass, onClose }) => {
     setTime1(convertDateToStr(currentDate));
 };
 
+
   const showMode1 = () => {
     setShow1(true);
   };
 
+  
+  const [location, setLocation] = useState([]);
+  const [isModalVisible, setModalVisible] = useState(false);
 
+  const handleAddLocation = (MapLocation) => {
+    //setClasses(prevClasses => [...prevClasses, newClassName]);
+    setModalVisible(false);
+  };
 
   return (
     <Modal visible={isVisible} onRequestClose={onClose} animationType="slide">
@@ -145,6 +152,15 @@ const ModalComponent = ({ isVisible, onAddClass, onClose }) => {
         />
         )}
         <DaySelector selectedDays={selectedDays} setSelectedDays={setSelectedDays}/>
+
+
+        <Button title="Find Location" onPress={() => setModalVisible(true)} />
+        <FormMap
+            isVisible={isModalVisible}
+            onAddLocation={handleAddLocation}
+            onClose={() => setModalVisible(false)}
+        />
+
         <Button title="Add" onPress={handleSave} />
         <Button title="Cancel" onPress={onClose} />
       </View>
