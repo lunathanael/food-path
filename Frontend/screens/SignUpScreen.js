@@ -97,7 +97,7 @@ export default function ProScreen({ navigation, route }) {
                 <Button title="Sign up" onPress={handleSignUp} color="#C55FFC" />
               </View>
               <View style={styles.button}>
-                <Button title="Go back" onPress={handleLogin} color="#C55FFC" />
+                <Button title="Log into Existing Account" onPress={handleLogin} color="#C55FFC" />
               </View>
             </View>
           </ScrollView>

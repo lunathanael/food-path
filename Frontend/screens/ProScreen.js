@@ -39,9 +39,6 @@ const auth = getAuth(app)
       
     };
 
-    // const handleSignUp = () => {
-    //   navigation.navigate("sign-up")
-    // };
 
     return (
       <KeyboardAvoidingView
@@ -71,9 +68,6 @@ const auth = getAuth(app)
               />
               <View style={styles.button}>
                 <Button title="Log In" onPress={handleLogin} color="#C55FFC" />
-              </View>
-              <View style={styles.button}>
-                <Button title="Sign Up" onPress={handleSignUp} color="#C55FFC" />
               </View>
             </View>
           </ScrollView>
