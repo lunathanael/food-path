@@ -1,19 +1,46 @@
 import React, {useState} from 'react';
-import { View, Text, TextInput, StyleSheet, Button, Dimensions} from 'react-native';
-
+import { View, Text, TextInput, StyleSheet, Button, Dimensions, Alert} from 'react-native';
+import { createUserWithEmailAndPassword, getAuth, updateProfile } from 'firebase/auth';
+import { app } from "../firebase"
 const { height, width } = Dimensions.get('screen');
 import { HeaderHeight } from "../constants/utils";
+
+const auth = getAuth(app)
 
   export default function ProScreen({navigation}) {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+    const [email, setEmail] = useState("")
+    const [isSignedUp, setIsSignedUp] = useState(false);
 
     const handleLogin = () => {
       navigation.navigate("sign-in")
     };
 
-    const handleSignUp = () => {
-      navigation.navigate("form")
+    const handleSignUp = async () => {
+      try {
+        await createUserWithEmailAndPassword(auth, email, password).then(async (userCredential) => {
+            if (userCredential.user) {
+                await updateProfile(userCredential.user, { displayName: username });
+                setIsSignedUp(true);
+                setEmail("")
+                setPassword("")
+                setUsername("")
+                navigation.navigate("sign-in")
+            }
+            else {
+                Alert.alert('Signup Error', 'Unable to find user after signup');
+            }
+        });
+    }
+      catch (error) {
+          if (error instanceof Error) {
+              Alert.alert('Error', error.message);
+          }
+          else {
+              Alert.alert('Error', 'An unknown error occurred');
+          }
+      }
     };
 
     return (
@@ -23,9 +50,9 @@ import { HeaderHeight } from "../constants/utils";
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
           />
           <TextInput
             style={styles.input}

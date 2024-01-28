@@ -1,15 +1,37 @@
 import React, {useState} from 'react';
-import { View, Text, TextInput, StyleSheet, Button, Dimensions} from 'react-native';
+import { View, Text, TextInput, StyleSheet, Button, Dimensions, Alert} from 'react-native';
 
 const { height, width } = Dimensions.get('screen');
 import { HeaderHeight } from "../constants/utils";
+import { signInWithEmailAndPassword, getAuth, updateProfile } from 'firebase/auth';
+import { app } from "../firebase"
+
+const auth = getAuth(app)
 
   export default function ProScreen({navigation}) {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+    const [email, setEmail] = useState("")
 
-    const handleLogin = () => {
-      navigation.navigate("app")
+    const handleLogin = async () => {
+      try {
+        await signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
+          if (userCredential.user) {
+            setEmail("")
+            setPassword("")
+            navigation.navigate("app")
+          }
+        });
+      }
+      catch (error) {
+        if (error instanceof Error) {
+          Alert.alert('Error', "Please sign up first or make sure your email and password are correct");
+        }
+        else {
+          Alert.alert('Error', 'An unknown error occurred');
+        }
+      }
+      
     };
 
     const handleSignUp = () => {
@@ -23,9 +45,9 @@ import { HeaderHeight } from "../constants/utils";
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
+            placeholder="email"
+            value={email}
+            onChangeText={setEmail}
           />
           <TextInput
             style={styles.input}
