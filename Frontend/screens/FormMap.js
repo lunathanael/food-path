@@ -1,18 +1,16 @@
-import React from 'react';
-import { Modal, View, ImageBackground, StyleSheet, StatusBar, Dimensions } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import { Modal, View, ImageBackground, StyleSheet, Dimensions } from 'react-native';
 import { Block, Button, Text, theme } from 'galio-framework';
 
 const { height, width } = Dimensions.get('screen');
 
 import materialTheme from '../constants/Theme';
-import Images from '../constants/Images';
+import locationData from '../constants/locationData';
 
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import * as Location from "expo-location";
 
-let id = 0;
-
-const DINING_HALLS_LOCATIONS = {
-  'South Pointe at Case': [42.72453932922057, -84.48844707117367], "Sparty's Market": [42.72867352001793, -84.49440369630766], "The Edge at Akers": [42.72426284934323, -84.46473942700027], "Brody Square": [42.731472990618464, -84.49519192699452], "Holden Dining Hall": [42.721120608388475, -84.48858822885974], "Holmes Dining Hall": [42.72679464281192, -84.4645800270007], "The State Room at Kellogg": [42.73191102029839, -84.49316017118278], "Heritage Commons at Landon": [42.733953903515385, -84.48511974233824], "Thrive at Owen": [42.726750094109065, -84.47062737303804], "The Vista at Shaw": [42.72702766286321, -84.47526964233279], "The Gallery at Snyder Phillips": [42.73019974531501, -84.47278836932867]};
+const BUILDING_LOCATIONS = locationData.BUILDING_LOCATIONS;
 
 const mapCustomStyle = [ 
   { "elementType": "geometry", "stylers": [ { "color": "#242f3e" } ] }, 
@@ -38,21 +36,83 @@ const mapCustomStyle = [
   { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [ { "color": "#17263c" } ] } 
 ];
   
+const Waiting_Driver_Screen = ({handleSetLocation, mapCustomStyle, onMapPress}) => {
+    const [currentLocation, setCurrentLocation] = useState(null);
+    const [initialRegion, setInitialRegion] = useState(null);
+    const markers = [];
 
-export default FormMap = ({isVisible, onAddLocation, onClose}) => {
+    for (const hall in BUILDING_LOCATIONS) {
+      markers.push({'key' : hall, 'coordinate': {'latitude': BUILDING_LOCATIONS[hall][0], 'longitude': BUILDING_LOCATIONS[hall][1]}});
+    }
+  
+    useEffect(() => {
 
-    this.state = {
-      region: {
-        latitude: 42.7229439975,
-        longitude: -84.4792321495,
-        latitudeDelta: 0.0422,
-        longitudeDelta: 0.0221,
-      },
-      markers: [],
-    };
+      const getLocation = async () => {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        let location = {'coords': {'latitude': 42.7229439975, 'longitude': -84.4792321495}};
+        if (status !== "granted") {
+          console.log("Permission to access location was denied");
+        }
+        else {
+            location = await Location.getCurrentPositionAsync({});
+        }
+  
+        setCurrentLocation(location.coords);
+  
+        setInitialRegion({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.0422,
+          longitudeDelta: 0.0221,
+        });
+      };
+  
+      getLocation();
+    }, []);
+  
+    return (
+      <View style={styles.container}>
+        {initialRegion && (
+            
+          <MapView 
+          style={styles.map} 
+          initialRegion={initialRegion}
+          customMapStyle={mapCustomStyle}
+          onPress={onMapPress}>
+            {currentLocation && (
+              <Marker
+                coordinate={{
+                  latitude: currentLocation.latitude,
+                  longitude: currentLocation.longitude,
+                }}
+                title="Your Location"
+              />
+            )}
+            {markers.map((marker) => (
+            <Marker
+              title={marker.key}
+              key={marker.key}
+              coordinate={marker.coordinate}
+              icon={require('../assets/icons/foodIcon.png')}
+              onPress={() => {
+                handleSetLocation(marker.coordinate)
+              }}>
+            </Marker>
+          ))}
+          </MapView>
+        )}
+      </View>
+    );
+};
+  
 
-    for (const hall in DINING_HALLS_LOCATIONS) {
-      this.state.markers.push({'key' : hall, 'coordinate': {'latitude': DINING_HALLS_LOCATIONS[hall][0], 'longitude': DINING_HALLS_LOCATIONS[hall][1]}});
+export default FormMap = ({isVisible, onAddLocation, onClose, setLocation}) => {
+
+    const [locationOpen, setLocationOpen] = useState(false);
+
+    const handleSetLocation = (coordinate) => {
+        setLocationOpen(true);
+        onAddLocation(coordinate);
     }
 
     return (
@@ -60,29 +120,21 @@ export default FormMap = ({isVisible, onAddLocation, onClose}) => {
       <Block flex style={styles.container}>
         
         <Block flex center>
-          <MapView
-            provider={PROVIDER_GOOGLE}
-            style={styles.map}
-            initialRegion={this.state.region}
-            customMapStyle={mapCustomStyle}
-            onPress={this.onMapPress}>
-              
-            {this.state.markers.map((marker) => (
-              <Marker
-                title={marker.key}
-                key={marker.key}
-                coordinate={marker.coordinate}
-                icon={require('../assets/icons/foodIcon.png')}
-                onPress={() => {
-                  console.log('callout pressed');
-                }}>
-              </Marker>
-            ))}
-          </MapView>
+            <Waiting_Driver_Screen
+            handleSetLocation={handleSetLocation} 
+            mapCustomStyle={mapCustomStyle} 
+            onMapPress={this.onMapPress}/>
         </Block>
         <Block flex space="between" style={styles.padded}>
           <Block flex space="around" style={{ zIndex: 1 }}>
             <Block center>
+              {locationOpen && (<Button
+                shadowless
+                style={styles.button}
+                color={materialTheme.COLORS.BUTTON_COLOR}
+                onPress={onClose}>
+                Finish
+              </Button>)}
               <Button
                 shadowless
                 style={styles.button}
