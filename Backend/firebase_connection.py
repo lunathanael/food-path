@@ -212,31 +212,28 @@ class FirebaseConnection:
     def get_dining_halls(self) -> list[DiningHall]:
         return [DiningHall(name, **dining_hall) for name, dining_hall in self.ref.child("dining_halls").get().items()]
     
-    def regester_listener(self):
-        users_ref = self.ref.child('users')
-        users_ref.listen(self.__on_user_change)
+    def register_review_listener(self) -> None:
+        self.ref.child('users').listen(self.__on_user_change)
     
-    def __on_user_change(self, event):
-        if event.event_type == 'patch':
-            reviews = event.data.get('reviews', {})
-            for food, liked in reviews.items():
-                self.update_food_review(food, liked)
+    def __on_user_change(self, event: db.Event) -> None:
+        if event.event_type == 'put':
+            return
+        dining_hall_name = list(event.data['users']['reviews'].keys())[0]
+        dining_hall: db.Reference = self.ref.child(f'dining_halls/{dining_hall_name}').get()
+        for food, liked in event.data['users']['reviews'][dining_hall_name].items():
+            time = None
+            if food in dining_hall['menu']['breakfast']:
+                time = 'breakfast'
+            if food in dining_hall['menu']['lunch']:
+                time = 'lunch'
+            if food in dining_hall['menu']['dinner']:
+                time = 'dinner'
+            if time:
+                dining_hall['menu'][time][food]['weight'] = min(1, dining_hall['menu'][time][food]['weight']+0.1) \
+                    if liked else max(0, dining_hall['menu'][time][food]['weight']-0.1)
+                    
+        self.ref.child(f'users/{event.path.split('/')[1]}/reviews').remove()
 
-    def update_food_review(self, food_name: str, liked: bool):
-        dining_halls = self.ref.child('dining_halls')
-        for dining_hall_name, db in dining_halls.get().items():
-            menu = db.get('menu', {})
-            for foods in menu.values():
-                for food in foods:
-                    if food.get('name') == food_name:
-                        if liked:
-                            food['weight'] += 0.1
-                            food['weight'] = min(1, food['weight'])
-                        else:
-                            food['weight'] -= 0.1
-                            food['weight'] = max(0, food['weight'])
-
-        
     #     # Use firebase admin to add listener to users
     #     # Add listener to user reviews
     #     # When listener is called, update food reviews
