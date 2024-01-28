@@ -1,57 +1,76 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  Button,
-  Dimensions,
-  Image,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Keyboard,
-} from 'react-native';
+import React, {useState} from 'react';
+import { View, Text, TextInput, StyleSheet, Button, Dimensions, Alert, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard} from 'react-native';
+import {app} from "../firebase"
+import {getAuth, createUserWithEmailAndPassword, updateProfile} from "firebase/auth"
+import { HeaderHeight } from "../constants/utils";
 
-const screenheight = Dimensions.get('screen').height;
-const screenwidth = Dimensions.get('screen').width;
-import { HeaderHeight } from '../constants/utils';
+const { height, width } = Dimensions.get('screen');
+const auth = getAuth(app)
 
-export default function ProScreen({ navigation }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+export default function SignUpScreen({navigation}) {
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [isSignedUp, setIsSignedUp] = useState(false)
+  const [email, setEmail] = useState("")
 
   const handleLogin = () => {
-    navigation.navigate('sign-in');
+    navigation.navigate("sign-in");
   };
 
-  const handleSignUp = () => {
-    navigation.navigate('sign-up');
+  const handleSignUp = async () => {
+    try {
+      await createUserWithEmailAndPassword(auth, email, password).then(async(userCredential) => {
+        if (userCredential.user) {
+          await updateProfile(userCredential.user, {displayName: username})
+          setIsSignedUp(true)
+          setEmail("")
+          setPassword("")
+          setUsername("")
+          navigation.navigate("sign-in");
+        } else {
+          Alert.alert("Error")
+        }
+      })
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert(error.message)
+      } else {
+        Alert.alert('Unknown error')
+      }
+    }
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior="padding"
-        keyboardVerticalOffset={HeaderHeight}
-      >
-        <Image source={require('../assets/images/proscreen.png')} style={styles.image} />
-        <View style={styles.info}>
-          <Text h1 style={styles.header}>Sign Up</Text>
-          <TextInput
-            placeholderTextColor="#7954A1"
-            style={styles.input}
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
+    <KeyboardAvoidingView behavior={'padding'} style={styles.container}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.inner}>
+          <Text style={styles.title}>Sign Up Screen</Text>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Username"
+              placeholderTextColor="black"
+              value={username}
+              onChangeText={setUsername}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
+          </View>
+          <Button
+            title="Sign Up"
+            onPress={handleSignUp}
+            color="#3498db"
           />
-          <TextInput
-            placeholderTextColor="#7954A1"
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
+          <Button
+            title="Log In"
+            onPress={handleLogin}
+            color="#3498db"
           />
           <View style={styles.button}>
             <Button title="Sign Up" style={styles.button} color="#FFFFFF" onPress={handleLogin} />
@@ -60,8 +79,9 @@ export default function ProScreen({ navigation }) {
             <Button title="Go Back" onPress={handleLogin} color="#FFFFFF" style={styles.sign} />
           </View>
         </View>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -75,10 +95,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  image: {
-    flex: 0.6,
+  inner: {
+    flex: 1,
     justifyContent: 'center',
-    width: screenwidth,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+
   },
   info: {
     flex: 0.5,

@@ -162,7 +162,6 @@ function FormScreenStack(props) {
   );
 }
 
-
 function ProScreenStack(props) {
   return (
     <Stack.Navigator
@@ -202,6 +201,7 @@ function OnboardingStack(props) {
       <Stack.Screen name="sign-in" component={ProScreenStack} />
       <Stack.Screen name="form" component={FormScreenStack} />
       <Stack.Screen name="app" component={AppStack} />
+      <Stack.Screen name="sign-up" component={SignUpScreen}/>
     </Stack.Navigator>
   );
 }
