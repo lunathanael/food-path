@@ -78,8 +78,7 @@ const ModalComponent = ({ isVisible, onAddClass, onClose }) => {
 
 
   const handleSave = () => {
-    onAddClass({
-    'name': className, 
+    onAddClass(className, {
     'time':
     {
         'start': time,

@@ -21,18 +21,23 @@ const firebaseConfig = {
 
 
 
-const YourScreen = ({navigation}) => {
-  const [classes, setClasses] = useState([]);
+const YourScreen = ({navigation, route}) => {
+  const [classes, setClasses] = useState({});
   const [isModalVisible, setModalVisible] = useState(false);
 
-  const handleAddClass = (newClassName) => {
-    setClasses(prevClasses => [...prevClasses, newClassName]);
+  const username = route.params.username;
+
+  const handleAddClass = (className, classInfo) => {
+
+    setClasses(prevClasses => ({...prevClasses, 'ClassName': classInfo}));
+
+
     setModalVisible(false);
   };
 
   // GET DATA
   const app = initializeApp(firebaseConfig);
-  const dbRef = ref(getDatabase(app));
+  const db = ref(getDatabase(app));
   get(child(dbRef, `users/Aidan/classes/CSE 232`)).then((snapshot) => {
     if (snapshot.exists()) {
       console.log(snapshot.val());
@@ -68,14 +73,9 @@ const YourScreen = ({navigation}) => {
   }
 
   const handleSaveClasses = async () => {
-    try {
-      const docRef = await addDoc(collection(db, 'Schedule'), {'Classes': classes});
-    }
-    catch (e) {
-      console.error("Error adding document: ", e);
-    }
+    set(ref(db, `users/${username}/`), classes);
 
-    navigation.navigate('app');
+    navigation.navigate('app', {});
   }
 
   return (

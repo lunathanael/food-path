@@ -23,7 +23,7 @@ export default function ProScreen({ navigation, route }) {
     navigation.navigate("sign-in")
   };
 
-  const handleSignUp = async () => {
+  const handleSignUp = async (username) => {
     try {
       await createUserWithEmailAndPassword(auth, email, password).then(async (userCredential) => {
         if (userCredential.user) {
@@ -35,7 +35,7 @@ export default function ProScreen({ navigation, route }) {
           try {
             await signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
               if (userCredential.user) {
-                navigation.navigate("form")
+                navigation.navigate("form", {'username': username})
               }
             });
           }
@@ -101,7 +101,7 @@ export default function ProScreen({ navigation, route }) {
                 onChangeText={setUsername}
               />
               <View style={styles.button}>
-                <Button title="Sign up" onPress={handleSignUp} color="#C55FFC" />
+                <Button title="Sign up" onPress={() => (handleSignUp(username))} color="#C55FFC" />
               </View>
               <View style={styles.button}>
                 <Button title="Log into Existing Account" onPress={handleLogin} color="#C55FFC" />
