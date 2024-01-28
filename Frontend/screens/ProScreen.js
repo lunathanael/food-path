@@ -19,7 +19,7 @@ const auth = getAuth(app)
           if (userCredential.user) {
             setEmail("")
             setPassword("")
-            navigation.navigate("app")
+            navigation.navigate("form")
           }
         });
       }
