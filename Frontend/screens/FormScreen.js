@@ -33,7 +33,7 @@ const YourScreen = ({navigation}) => {
         keyExtractor={(item, index) => index.toString()}
         renderItem={handleRenderItem}
       />
-      <Button title="Add New Class" onPress={() => setModalVisible(true)} />
+      <Button title="Add Class" onPress={() => setModalVisible(true)} />
 
       <ModalComponent
         isVisible={isModalVisible}
