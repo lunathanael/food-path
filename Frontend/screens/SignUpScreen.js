@@ -9,16 +9,16 @@ import { HeaderHeight } from "../constants/utils";
     const [password, setPassword] = useState("")
 
     const handleLogin = () => {
-      navigation.navigate("app")
+      navigation.navigate("sign-in")
     };
 
     const handleSignUp = () => {
-      navigation.navigate("sign-up")
+      navigation.navigate("form")
     };
 
     return (
         <View style={styles.container}>
-        <Text style={styles.title}>Log In Screen</Text>
+        <Text style={styles.title}>Sign Up Screen</Text>
 
         <View style={styles.inputContainer}>
           <TextInput
@@ -35,18 +35,18 @@ import { HeaderHeight } from "../constants/utils";
             onChangeText={setPassword}
           />
         </View>
-
+        <Button
+          title="Sign Up"
+          onPress={handleSignUp}
+          color="#3498db"
+        />
         <Button
           title="Log In"
           onPress={handleLogin}
           color="#3498db"
         />
 
-        <Button
-          title="Sign Up"
-          onPress={handleSignUp}
-          color="#3498db"
-        />
+
       </View>
     );
 }

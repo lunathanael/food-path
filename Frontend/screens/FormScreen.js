@@ -14,7 +14,7 @@ import { HeaderHeight } from "../constants/utils";
 
     return (
         <View style={styles.container}>
-        <Text style={styles.title}>Login</Text>
+        <Text style={styles.title}>Class Form</Text>
 
         <View style={styles.inputContainer}>
           <TextInput
