@@ -25,11 +25,12 @@ const YourScreen = ({route, navigation}) => {
   const [classes, setClasses] = useState({});
   const [isModalVisible, setModalVisible] = useState(false);
 
+  console.log(route.params);
   const {username} = route.params;
 
   const handleAddClass = ({className, classInfo}) => {
 
-    setClasses(prevClasses => ({...prevClasses, 'ClassName': classInfo}));
+    //setClasses(prevClasses => ({...prevClasses, `${ClassName}`: classInfo}));
 
 
     setModalVisible(false);
@@ -38,22 +39,7 @@ const YourScreen = ({route, navigation}) => {
   // GET DATA
   const app = initializeApp(firebaseConfig);
   const db = ref(getDatabase(app));
-  get(child(db, `users/Aidan/classes/CSE 232`)).then((snapshot) => {
-    if (snapshot.exists()) {
-      console.log(snapshot.val());
-    } else {
-      console.log("No data available");
-    }
-  }).catch((error) => {
-    console.error(error);
-  });
-  // GET DATA
-  // SET DATA
-  set(ref(db, 'users/Aidan/classes/CSE 232'), {
-    username: "name",
-    email: "email",
-    profile_picture : "imageUrl"
-  });
+
   // SET DATA
   const handleRenderItem = ({item}) => {
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
