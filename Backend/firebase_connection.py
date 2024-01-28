@@ -69,7 +69,7 @@ class Class:
         self.end: int = time["end"]
         self.days: list[int] = days
 class User:
-    def __init__(self, username: str, password: str, classes: dict, location: dict[str, int], food_plan: dict = {}):
+    def __init__(self, username: str, password: str, classes: dict, location: dict[str, int], food_plan: dict = None, reviews: dict = None):
         self.username: str = username
         self.password: str = password
         self.classes: list[Class] = [Class(name, **class_data) for name, class_data in classes.items()]
@@ -218,20 +218,13 @@ class FirebaseConnection:
     def get_dining_halls(self) -> list[DiningHall]:
         return [DiningHall(name, **dining_hall) for name, dining_hall in self.ref.child("dining_halls").get().items()]
     
-    def find_distance(person_location:[int, int], dining_hall_location:[int, int]):
-        distance = (person_location[0]-dining_hall_location[0])^2+(person_location[1]-dining_hall_location[1])^2
-        distance = sqrt(distance)
-    def check_distance(person_location:[int, int]):
-        for hall, db in DINING_HALLS:
-            if find_distance(person_location, db['location'])<0.5:
-                raise_question(hall)
-    def raise_question(hall: Menu):
-        for food in hall.breakfast:
-            rating = input("Do you like the {food.name}? from {hall.name}")
-            if rating == True:
-                food.increase_weight
-            else:
-                food.decrease_weight
+    def regester_listener():
+        # Use firebase admin to add listener to users
+        # Add listener to user reviews
+        # When listener is called, update food reivews
+        # Loop through dining hall and if the food has been reviewed update its rating
+        ...
+        
 
 if __name__ == "__main__":
     firebase_connection = FirebaseConnection()
