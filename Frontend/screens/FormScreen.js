@@ -33,7 +33,7 @@ const YourScreen = ({navigation}) => {
   // GET DATA
   const app = initializeApp(firebaseConfig);
   const dbRef = ref(getDatabase(app));
-  get(child(dbRef, `users/Aidan`)).then((snapshot) => {
+  get(child(dbRef, `users/Aidan/classes/CSE 232`)).then((snapshot) => {
     if (snapshot.exists()) {
       console.log(snapshot.val());
     } else {
@@ -43,6 +43,13 @@ const YourScreen = ({navigation}) => {
     console.error(error);
   });
   // GET DATA
+  // SET DATA
+  set(ref(db, 'users/Aidan/classes/CSE 232'), {
+    username: "name",
+    email: "email",
+    profile_picture : "imageUrl"
+  });
+  // SET DATA
   const handleRenderItem = ({item}) => {
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
