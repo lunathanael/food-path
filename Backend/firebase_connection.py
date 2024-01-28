@@ -84,12 +84,6 @@ class Food:
     def to_dict(self) -> dict:
         return {"weight": self.weight, "calories": self.calories, "description": self.description}
 
-    def increase_weight(self):
-        self.weight += 0.1
-        self.weight = min(1, self.weight)
-    def decrease_weight(self):
-        self.weight -= 0.1
-        self.weight = max(0, self.weight)
 
 class Menu:
     def __init__(self, breakfast: dict = {}, lunch: dict = {}, dinner: dict = {}):
@@ -218,12 +212,38 @@ class FirebaseConnection:
     def get_dining_halls(self) -> list[DiningHall]:
         return [DiningHall(name, **dining_hall) for name, dining_hall in self.ref.child("dining_halls").get().items()]
     
-    def regester_listener():
-        # Use firebase admin to add listener to users
-        # Add listener to user reviews
-        # When listener is called, update food reivews
-        # Loop through dining hall and if the food has been reviewed update its rating
-        ...
+    def regester_listener(self):
+        users_ref = self.ref.child('users')
+        users_ref.listen(self.__on_user_change)
+    
+    def __on_user_change(self, event):
+        if event.event_type == 'patch':
+            reviews = event.data.get('reviews', {})
+            for food, liked in reviews.items():
+                self.update_food_review(food, liked)
+
+    def update_food_review(self, food_name: str, liked: bool):
+        dining_halls = self.ref.child('dining_halls')
+        for dining_hall_name, db in dining_halls.get().items():
+            menu = db.get('menu', {})
+            for foods in menu.values():
+                for food in foods:
+                    if food.get('name') == food_name:
+                        if liked:
+                            food['weight'] += 0.1
+                            food['weight'] = min(1, food['weight'])
+                        else:
+                            food['weight'] -= 0.1
+                            food['weight'] = max(0, food['weight'])
+
+        
+    #     # Use firebase admin to add listener to users
+    #     # Add listener to user reviews
+    #     # When listener is called, update food reviews
+    #     # Loop through dining hall and if the food has been reviewed update its rating
+    #     ...
+        
+
         
 
 if __name__ == "__main__":
