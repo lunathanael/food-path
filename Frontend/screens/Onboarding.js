@@ -62,13 +62,6 @@ export default class Onboarding extends React.Component {
     
   onMapPress(e) {
     this.setState({
-      markers: [
-        ...this.state.markers,
-        {
-          coordinate: e.nativeEvent.coordinate,
-          key: `foo${id++}`,
-        },
-      ],
     });
   }
   
