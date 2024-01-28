@@ -128,19 +128,19 @@ export default FormMap = ({isVisible, onAddLocation, onClose, setLocation}) => {
         <Block flex space="between" style={styles.padded}>
           <Block flex space="around" style={{ zIndex: 1 }}>
             <Block center>
+              {locationOpen && (<Button
+                shadowless
+                style={styles.button}
+                color={materialTheme.COLORS.BUTTON_COLOR}
+                onPress={onClose}>
+                Finish
+              </Button>)}
               <Button
                 shadowless
                 style={styles.button}
                 color={materialTheme.COLORS.BUTTON_COLOR}
                 onPress={() => navigation.navigate('sign-in')}>
                 Manual Entry
-              </Button>
-              <Button
-                shadowless
-                style={styles.button}
-                color={materialTheme.COLORS.BUTTON_COLOR}
-                onPress={onClose}>
-                Finish
               </Button>
             </Block>
           </Block>
