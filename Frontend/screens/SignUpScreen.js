@@ -96,7 +96,7 @@ export default function ProScreen({ navigation, route }) {
               <TextInput
                 style={styles.input}
                 placeholderTextColor="#7954A1"
-                placeholder="Password"
+                placeholder="Username"
                 value={username}
                 onChangeText={setUsername}
               />
