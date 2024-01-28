@@ -105,7 +105,7 @@ export default class Onboarding extends React.Component {
                 shadowless
                 style={styles.button}
                 color={materialTheme.COLORS.BUTTON_COLOR}
-                onPress={() => navigation.navigate('sign-in')}>
+                onPress={() => navigation.navigate('sign-up')}>
                 GET STARTED
               </Button>
             </Block>

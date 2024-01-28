@@ -77,14 +77,15 @@ const ModalComponent = ({ isVisible, onAddClass, onClose }) => {
 
 
   const handleSave = () => {
-    onAddClass({'className': className, 'start_time': time, 'end_time':time1, 'selectedDays': selectedDays});
-    setClassName('');
+    onAddClass({'className': className, 'startTime': time, 'endTime':time1, 'selectedDays': selectedDays, 'coordinates' : location});
 
+    setClassName('');
     setDate(new Date(Date.now()));
     setTime(convertDateToStr(new Date(Date.now())));
     setDate1(new Date(Date.now()));
     setTime1(convertDateToStr(new Date(Date.now())));
     setSelectedDays([]);
+    setLocation([]);
   };
 
   const onChange = (event, selectedDate) => {
@@ -116,7 +117,6 @@ const ModalComponent = ({ isVisible, onAddClass, onClose }) => {
 
   const handleAddLocation = (MapLocation) => {
     setLocation(MapLocation);
-    console.log(MapLocation);
   };
 
   return (

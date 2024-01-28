@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+
+import React, {useEffect, useState} from 'react';
 import { View, Text, TextInput, StyleSheet, Button, Dimensions, Alert, Image, KeyboardAvoidingView, TouchableWithoutFeedback, ScrollView, Keyboard} from 'react-native';
 
 const { height, width } = Dimensions.get('screen');
@@ -11,10 +12,11 @@ import { app } from "../firebase"
 
 const auth = getAuth(app)
 
-  export default function ProScreen({navigation}) {
+  export default function ProScreen({navigation, route}) {
     const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
     const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [isSignedIn, setIsSignedIn] = useState(false)
 
     const handleLogin = async () => {
       try {
@@ -22,7 +24,7 @@ const auth = getAuth(app)
           if (userCredential.user) {
             setEmail("")
             setPassword("")
-            navigation.navigate("app")
+            navigation.navigate("form")
           }
         });
       }
@@ -37,9 +39,9 @@ const auth = getAuth(app)
       
     };
 
-    const handleSignUp = () => {
-      navigation.navigate("sign-up")
-    };
+    // const handleSignUp = () => {
+    //   navigation.navigate("sign-up")
+    // };
 
     return (
       <KeyboardAvoidingView
