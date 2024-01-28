@@ -130,6 +130,7 @@ const ModalComponent = ({ isVisible, onAddClass, onClose }) => {
     <Modal visible={isVisible} onRequestClose={onClose} animationType="slide">
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <TextInput
+        style={{ backgroundColor: '#ededed', height: 60 }}
           placeholder="Class Name"
           value={className}
           onChangeText={setClassName}

@@ -76,6 +76,7 @@ const Waiting_Driver_Screen = ({handleSetLocation, mapCustomStyle, onMapPress}) 
         {initialRegion && (
             
           <MapView 
+          provider={PROVIDER_GOOGLE}
           style={styles.map} 
           initialRegion={initialRegion}
           customMapStyle={mapCustomStyle}
@@ -113,11 +114,13 @@ const ManualEntry = ({isVisible, onAddLocation, onClose}) => {
     return (
         <Modal visible={isVisible}>
             <TextInput
+            style={{ backgroundColor: '#ededed', height: 60 }}
                 placeholder="Longitude"
                 value={longitude}
                 onChangeText={setLongitude}
             />
             <TextInput
+            style={{ backgroundColor: '#ededed', height: 60 }}
                 placeholder="Latitude"
                 value={latitude}
                 onChangeText={setLatitude}

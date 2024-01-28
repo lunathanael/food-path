@@ -8,6 +8,16 @@
 const defaultSourceExts = require('metro-config/src/defaults/defaults').sourceExts
 const sourceExts = [ 'jsx', 'js', 'ts', 'tsx', 'json', 'svg', 'd.ts', 'mjs', 'cjs' ].concat(defaultSourceExts)
 
+const { getDefaultConfig } = require("metro-config");
+const { resolver: defaultResolver } = getDefaultConfig.getDefaultValues();
+exports.resolver = {
+  ...defaultResolver,
+  sourceExts: [
+    ...defaultResolver.sourceExts,
+    "cjs",
+  ],
+};
+
 module.exports = {
   transformer: {
     getTransformOptions: async () => ({

@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
-import { View, Button, FlatList, Text } from 'react-native';
+import { View, Button, FlatList, Text, LogBox } from 'react-native';
 import ModalComponent from './ModalComponent'; // Import your modal component
 
-import { getFirestore } from "firebase/firestore";
 
 import { collection, addDoc } from "firebase/firestore"; 
 
-import {app} from '../firebase'
-const db = getFirestore(app);
+import { getApps, initializeApp } from "firebase/app";
+import {app, db} from '../firebase'
+
+if (!getApps().length) {
+  initializeApp(firebaseConfig);
+}
+LogBox.ignoreLogs([`Setting a timer for a long period`]);
+
 
 const YourScreen = ({navigation}) => {
   const [classes, setClasses] = useState([]);
@@ -38,7 +43,15 @@ const YourScreen = ({navigation}) => {
   const handleSaveClasses = async () => {
     try {
       for (const c in classes) {
-        const docRef = await addDoc(collection(db, 'classes'), c);
+        const docRef = await addDoc(collection(db, 'classes'), {
+          Name:'name',
+          Latitude:0.1,
+          Longitude:0.2,
+          DaysOfWeek:[0,1,2],
+          StartTime:"startsnow",
+          EndTime:"Cya",
+        });
+        console.log(docRef.id)
       }
     }
     catch (e) {
