@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Button, FlatList, Text, LogBox } from 'react-native';
+import { View, Button, FlatList, Text } from 'react-native';
 import ModalComponent from './ModalComponent'; // Import your modal component
 
 
@@ -8,10 +8,6 @@ import { collection, addDoc } from "firebase/firestore";
 import { getApps, initializeApp } from "firebase/app";
 import {app, db} from '../firebase'
 
-if (!getApps().length) {
-  initializeApp(firebaseConfig);
-}
-LogBox.ignoreLogs([`Setting a timer for a long period`]);
 
 
 const YourScreen = ({navigation}) => {
@@ -42,17 +38,12 @@ const YourScreen = ({navigation}) => {
 
   const handleSaveClasses = async () => {
     try {
-      for (const c in classes) {
-        const docRef = await addDoc(collection(db, 'classes'), {
-          Name:'name',
-          Latitude:0.1,
-          Longitude:0.2,
-          DaysOfWeek:[0,1,2],
-          StartTime:"startsnow",
-          EndTime:"Cya",
-        });
+      const classes_t = classes
+      classes.forEach((classItem, index) => {
+        console.log(classItem)
+        const docRef = addDoc(collection(db, 'classes'), classItem);
         console.log(docRef.id)
-      }
+      });
     }
     catch (e) {
       console.error("Error adding document: ", e);
