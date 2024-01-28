@@ -59,8 +59,7 @@ const ModalComponent = ({ isVisible, onAddClass, onClose }) => {
   const [selectedDays, setSelectedDays] = useState([]);
 
   const handleSave = () => {
-    console.log(selectedDays);
-    onAddClass({'className': className, 'timeName': timeName});
+    onAddClass({'className': className, 'timeName': timeName, 'selectedDays': selectedDays});
     setClassName('');
     setTimeName('');
     setSelectedDays([]);

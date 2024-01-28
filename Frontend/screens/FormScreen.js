@@ -12,9 +12,16 @@ const YourScreen = ({navigation}) => {
   };
 
   const handleRenderItem = ({item}) => {
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
     return (
       <>
         <Text>{item.className}, {item.timeName}</Text>
+        <View>
+        {item.selectedDays.map(dayId => (
+          <Text>{daysOfWeek[dayId]}</Text>
+        ))}
+      </View>
       </>
     );
   }
