@@ -4,51 +4,51 @@ import { View, Text, TextInput, StyleSheet, Button, Dimensions} from 'react-nati
 const { height, width } = Dimensions.get('screen');
 import { HeaderHeight } from "../constants/utils";
 
-  export default function ProScreen({navigation}) {
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
+export default function ProScreen({navigation}) {
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
 
-    const handleLogin = () => {
-      navigation.navigate("app")
-    };
+  const handleLogin = () => {
+    navigation.navigate("app")
+  };
 
-    const handleSignUp = () => {
-      navigation.navigate("sign-up")
-    };
+  const handleSignUp = () => {
+    navigation.navigate("Sign up")
+  };
 
-    return (
-        <View style={styles.container}>
-        <Text style={styles.title}>Log In Screen</Text>
+  return (
+      <View style={styles.container}>
+      <Text style={styles.title}>Log In Screen</Text>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-        </View>
-
-        <Button
-          title="Log In"
-          onPress={handleLogin}
-          color="#3498db"
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
         />
-
-        <Button
-          title="Sign Up"
-          onPress={handleSignUp}
-          color="#3498db"
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
         />
       </View>
-    );
+
+      <Button
+        title="Log In"
+        onPress={handleLogin}
+        color="#3498db"
+      />
+
+      <Button
+        title="Sign Up"
+        onPress={handleSignUp}
+        color="#3498db"
+      />
+    </View>
+  );
 }
 const styles = StyleSheet.create({
   container: {

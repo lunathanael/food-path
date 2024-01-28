@@ -158,25 +158,6 @@ function FormScreenStack(props) {
   );
 }
 
-function SignUpScreenStack(props) {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        mode: "card",
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen
-        name="sign-up"
-        component={SignUpScreen}
-        option={{
-          headerTransparent: true,
-        }}
-      />
-    </Stack.Navigator>
-  );
-}
-
 function ProScreenStack(props) {
   return (
     <Stack.Navigator
@@ -192,7 +173,7 @@ function ProScreenStack(props) {
           headerTransparent: true,
         }}
       />
-      <Stack.Screen name="sign-up" component={SignUpScreenStack}/>
+      {/* <Stack.Screen name="sign-up" component={SignUpScreen}/> */}
     </Stack.Navigator>
   );
 }
@@ -216,6 +197,7 @@ function OnboardingStack(props) {
       <Stack.Screen name="sign-in" component={ProScreenStack} />
       <Stack.Screen name="form" component={FormScreenStack} />
       <Stack.Screen name="app" component={AppStack} />
+      <Stack.Screen name="sign-up" component={SignUpScreen}/>
     </Stack.Navigator>
   );
 }
