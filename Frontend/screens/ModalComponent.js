@@ -62,7 +62,8 @@ const ModalComponent = ({ isVisible, onAddClass, onClose }) => {
 
   const convertDateToStr = (d) => {
     return (
-        d.toLocaleTimeString('it-IT').substr(0, 2) + d.toLocaleTimeString('it-IT').substr(3, 2)
+        //d.toLocaleTimeString('it-IT').substr(0, 2) + d.toLocaleTimeString('it-IT').substr(3, 2)
+        d.toLocaleTimeString('it-IT')
     );
   }
 
@@ -77,7 +78,13 @@ const ModalComponent = ({ isVisible, onAddClass, onClose }) => {
 
 
   const handleSave = () => {
-    onAddClass({'className': className, 'startTime': time, 'endTime':time1, 'selectedDays': selectedDays, 'coordinates' : location});
+    onAddClass({
+    'Name': className, 
+    'StartTime': time,
+    'EndTime': time1, 
+    'DaysOfWeek': selectedDays, 
+    'Longitude' : location.longitude, 
+    'Latitude': location.latitude});
 
     setClassName('');
     setDate(new Date(Date.now()));
