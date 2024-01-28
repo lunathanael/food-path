@@ -1,5 +1,5 @@
 import React from 'react';
-import { ImageBackground, StyleSheet, StatusBar, Dimensions } from 'react-native';
+import { View, ImageBackground, StyleSheet, StatusBar, Dimensions } from 'react-native';
 import { Block, Button, Text, theme } from 'galio-framework';
 
 const { height, width } = Dimensions.get('screen');
@@ -85,7 +85,10 @@ export default class Onboarding extends React.Component {
                 key={marker.key}
                 coordinate={marker.coordinate}
                 icon={require('../assets/icons/foodIcon.png')}
-              />
+                onPress={() => {
+                  console.log('callout pressed');
+                }}>
+              </Marker>
             ))}
           </MapView>
         </Block>
